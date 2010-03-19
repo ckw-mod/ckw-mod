@@ -921,8 +921,12 @@ static BOOL create_console(ckOpt& opt)
 	while((gConWnd = GetConsoleWindow()) == NULL) {
 		Sleep(10);
 	}
-
+	// Ç±ÇÃÉãÅ[ÉvÇí«â¡
 	while(!IsWindowVisible(gConWnd)) {
+	  Sleep(10);
+	}
+	while(IsWindowVisible(gConWnd)) {
+		ShowWindow(gConWnd, SW_HIDE);
 		Sleep(10);
 	}
 
