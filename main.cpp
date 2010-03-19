@@ -976,7 +976,7 @@ static BOOL create_console(ckOpt& opt)
 		fonts = GetNumberOfConsoleFonts();
 		if (fonts > MAX_FONTS)
 			fonts = MAX_FONTS;
-
+	
 		GetConsoleFontInfo(gStdOut, 0, fonts, font);
 		CONSOLE_FONT minimalFont = { 0, {0, 0}};
 		for(DWORD i=0;i<fonts;i++){
@@ -1008,7 +1008,7 @@ static BOOL create_console(ckOpt& opt)
 }
 
 /*----------*/
-static BOOL init_options(ckOpt& opt)
+BOOL init_options(ckOpt& opt)
 {
 	/* create argv */
 	int	i, argc;

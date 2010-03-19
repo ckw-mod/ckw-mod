@@ -10,6 +10,7 @@ public:
 	ckOpt();
 	~ckOpt();
 
+	void		setFile(char *path=NULL);
 	void		loadXdefaults();
 	bool		set(int argc, char *argv[]);
 
@@ -94,6 +95,7 @@ private:
 	bool		m_isTopMost;
 	std::string	m_curDir;
 	std::string	m_title;
+	char	m_config_file[MAX_PATH+1];
 };
 
 #endif /* __CK_OPT_H__ */

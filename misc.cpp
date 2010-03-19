@@ -20,6 +20,9 @@
  *---------------------------------------------------------------------------*/
 #include "ckw.h"
 #include "rsrc.h"
+#include "option.h"
+
+BOOL init_options(ckOpt& opt);
 
 static void __write_console_input(LPCWSTR str, DWORD length)
 {
@@ -35,8 +38,18 @@ static void __write_console_input(LPCWSTR str, DWORD length)
 		p->Event.KeyEvent.wRepeatCount = 1;
 		p->Event.KeyEvent.wVirtualKeyCode = 0;
 		p->Event.KeyEvent.wVirtualScanCode = 0;
-		p->Event.KeyEvent.uChar.UnicodeChar = *str++;
+		p->Event.KeyEvent.uChar.UnicodeChar = 0;
 		p->Event.KeyEvent.dwControlKeyState = 0;
+		if(*str == '\r') {
+			str++;
+			length--;
+		}
+		if(*str == '\n') {
+			p->Event.KeyEvent.wVirtualKeyCode = VK_RETURN;
+			str++;
+		} else {
+			p->Event.KeyEvent.uChar.UnicodeChar = *str++;
+		}
 	}
 
 	WriteConsoleInput(gStdIn, buf, length, &length);
@@ -137,6 +150,8 @@ L" 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA."
 }
 
 /*----------*/
+void	sysmenu_init_subconfig(HWND hWnd, HMENU hMenu);
+
 void	sysmenu_init(HWND hWnd)
 {
 	MENUITEMINFO mii;
@@ -152,11 +167,99 @@ void	sysmenu_init(HWND hWnd)
 	mii.cch = (UINT) wcslen(mii.dwTypeData);
 	InsertMenuItem(hMenu, SC_CLOSE, FALSE, &mii);
 
+    sysmenu_init_subconfig(hWnd, hMenu);
+
 	mii.fType = MFT_SEPARATOR;
 	mii.wID = 0;
 	mii.dwTypeData = 0;
 	mii.cch = 0;
 	InsertMenuItem(hMenu, SC_CLOSE, FALSE, &mii);
+}
+
+void    get_directory_path(wchar_t *path)
+{
+	wchar_t *c;
+	GetModuleFileName(NULL, path, MAX_PATH);
+	c = wcsrchr(path, L'\\');
+	if(c) *c = 0;
+}
+
+void	sysmenu_init_subconfig(HWND hWnd, HMENU hMenu)
+{
+	MENUITEMINFO mii;
+    HMENU hSubMenu = CreatePopupMenu();
+
+	memset(&mii, 0, sizeof(mii));
+	mii.cbSize = sizeof(mii);
+	mii.fMask = MIIM_TYPE | MIIM_ID;
+
+	wchar_t path[MAX_PATH+1];
+    get_directory_path(path);
+    wcscat_s(path, L"\\*.cfg");
+
+    WIN32_FIND_DATA fd;
+	memset(&fd, 0, sizeof(fd));
+    HANDLE hFile = FindFirstFile(path, &fd);
+    //MessageBox(hWnd, path, L"", MB_OK);
+
+    if (hFile != INVALID_HANDLE_VALUE)
+    {
+        for(int i = 0;;i++)
+        {
+            mii.fType = MFT_STRING;
+            mii.wID = IDM_CONFIG_SELECT_1 + i;
+            mii.dwTypeData = fd.cFileName;
+            mii.cch = (UINT) wcslen(mii.dwTypeData);
+            InsertMenuItem(hSubMenu, 0, TRUE, &mii);
+            if(FindNextFile(hFile, &fd) == 0) { break; }
+        }
+        FindClose(hFile);
+    }
+
+	mii.fMask |= MIIM_SUBMENU;
+	mii.fType = MFT_STRING;
+	mii.wID = IDM_CONFIG_SELECT;
+	mii.hSubMenu = hSubMenu;
+	mii.dwTypeData = L"Config (&O)";
+	mii.cch = (UINT) wcslen(mii.dwTypeData);
+	InsertMenuItem(hMenu, SC_CLOSE, FALSE, &mii);
+}
+
+void reloadConfig(wchar_t *path)
+{
+	char filepath[MAX_PATH+1];
+	wcstombs(filepath, path, MAX_PATH);
+
+	ckOpt opt;
+	opt.setFile(filepath);
+    init_options(opt);
+}
+
+BOOL    onConfigMenuCommand(HWND hWnd, DWORD id)
+{
+	wchar_t path[MAX_PATH+1];
+    get_directory_path(path);
+
+	MENUITEMINFO mii;
+	memset(&mii, 0, sizeof(mii));
+	mii.cbSize = sizeof(mii);
+	mii.fMask = MIIM_TYPE | MIIM_ID;
+    mii.fType = MFT_STRING;
+
+	HMENU hMenu = GetSystemMenu(hWnd, FALSE);
+    if (GetMenuItemInfo(hMenu, id, 0, &mii))
+    {
+        wchar_t sz[MAX_PATH+1], filepath[MAX_PATH+1];
+        mii.dwTypeData = sz;
+        mii.cch++;
+        GetMenuItemInfo(hMenu, id, 0, &mii);
+        wsprintf(filepath, L"%s\\%s", path, sz);
+        /* need to open file and update config here */
+        MessageBox(hWnd, filepath, L"", MB_OK);
+		reloadConfig(filepath);
+    }
+
+    return(TRUE);
 }
 
 /*----------*/
@@ -170,6 +273,9 @@ BOOL	onSysCommand(HWND hWnd, DWORD id)
 			  AboutDlgProc);
 		return(TRUE);
 	}
+    if(IDM_CONFIG_SELECT < id && id <= IDM_CONFIG_SELECT_MAX) {
+        return onConfigMenuCommand(hWnd, id);
+    }
 	return(FALSE);
 }
 
