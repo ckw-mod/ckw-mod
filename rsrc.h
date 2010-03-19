@@ -1,0 +1,7 @@
+#define IDR_ICON	101
+
+#define IDD_DIALOG1	105
+#define IDC_STATIC1	10001
+#define IDC_EDIT1	10002
+
+#define IDM_ABOUT	40001

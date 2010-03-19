@@ -1,0 +1,41 @@
+!
+! ckw setting
+!
+
+!Ckw*foreground: white
+!Ckw*background: midnightblue
+!Ckw*cursorColor:     green
+!Ckw*cursorImeColor:  red
+!Ckw*backgroundBitmap: ckw_background.bmp
+
+Ckw*scrollHide:  no
+Ckw*scrollRight: yes
+Ckw*internalBorder: 1
+Ckw*lineSpace: 0
+Ckw*topmost: no
+!Ckw*transp: 255
+!Ckw*transpColor: #000000
+
+Ckw*font: ÇlÇr ÉSÉVÉbÉN
+Ckw*fontSize: 14
+
+Ckw*geometry:  80x24
+Ckw*saveLines: 500
+
+Ckw*color0:  #000000
+Ckw*color1:  #000080
+Ckw*color2:  #008000
+Ckw*color3:  #008080
+Ckw*color4:  #800000
+Ckw*color5:  #800080
+Ckw*color6:  #808000
+Ckw*color7:  #C0C0C0
+
+Ckw*color8:  #808080
+Ckw*color9:  #0000FF
+Ckw*color10: #00FF00
+Ckw*color11: #00FFFF
+Ckw*color12: #FF0000
+Ckw*color13: #FF00FF
+Ckw*color14: #FFFF00
+Ckw*color15: #FFFFFF

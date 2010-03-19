@@ -1,0 +1,58 @@
+2005-10-27  Kazuo Ishii  <k-ishii@wb4.so-net.ne.jp>
+	Version 0.8.10
+	* main.cpp
+	DOS窓が確実に消えるまで待つようにした。
+
+2005-09-08  Kazuo Ishii  <k-ishii@wb4.so-net.ne.jp>
+	Version 0.8.9
+	* main.cpp
+	screen bufferから正しく読み取れず画面表示が乱れることがあった。
+
+2005-09-06  Kazuo Ishii  <k-ishii@wb4.so-net.ne.jp>
+	Version 0.8.8
+	* main.cpp
+	アプリ側からのウィンドウサイズ変更に対応。
+
+2005-07-06  Kazuo Ishii  <k-ishii@wb4.so-net.ne.jp>
+	Version 0.8.7
+	* main.cpp
+	* selection.cpp
+	* ckw.h
+	２バイト文字の表示がズレてしまう環境があるので対処。
+	（ReadConsoleOutputAを使うようにした）
+
+2005-07-04  Kazuo Ishii  <k-ishii@wb4.so-net.ne.jp>
+	Version 0.8.6
+	* main.cpp
+	ReadConsoleOutputで落ちることがあるので 回数を減らして落ちにくくした。
+
+2005-06-14  Kazuo Ishii  <k-ishii@wb4.so-net.ne.jp>
+	Version 0.8.5
+	* main.cpp
+	ckw本体が Ctrl-Cで終了してしまうバグを修正。
+
+2005-06-09  Kazuo Ishii  <k-ishii@wb4.so-net.ne.jp>
+	Version 0.8.4
+	* main.cpp
+	IME入力中、候補ウィンドウなどが表示されなかった。
+
+2005-05-25  Kazuo Ishii  <k-ishii@wb4.so-net.ne.jp>
+	Version 0.8.3
+	* main.cpp
+	文字背景色が適用されてなかった。
+	スクリーンバッファの差し替えに対応してなかった。
+
+2005-05-14  Kazuo Ishii  <k-ishii@wb4.so-net.ne.jp>
+	Version 0.8.2
+	* main.cpp
+	WindowsXPでも日本語の２バイトフラグが付かない環境があるようなので、
+	常に全角かチェックするようにした。
+
+2005-04-30  Kazuo Ishii  <k-ishii@wb4.so-net.ne.jp>
+	Version 0.8.1
+	* main.cpp
+	* selection.cpp
+	Windows2000で日本語が正しく表示できてなかった
+
+2005-04-24  Kazuo Ishii  <k-ishii@wb4.so-net.ne.jp>
+	Version 0.8.0

@@ -1,0 +1,41 @@
+#include "version.h"
+#include "rsrc.h"
+#include "winuser.h"
+
+IDR_ICON ICON  "rsrc/icon.ico"
+
+IDD_DIALOG1 DIALOGEX 0,0,255,78
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "About"
+FONT 9, "MS Shell Dlg"
+BEGIN
+  DEFPUSHBUTTON "OK",IDOK,208,7,40,14
+  LTEXT         ABOUT_DLG_STRING,
+                IDC_STATIC1,7,7,200,16
+  EDITTEXT      IDC_EDIT1,7,31,241,40,ES_MULTILINE | ES_AUTOHSCROLL |
+                ES_READONLY | WS_VSCROLL
+END
+
+1 VERSIONINFO 
+FILEVERSION    VERSION_MAJOR, VERSION_MINOR, VERSION_BUGFIX, 0
+PRODUCTVERSION VERSION_MAJOR, VERSION_MINOR, VERSION_BUGFIX, 0
+FILEFLAGSMASK 0x3FL
+FILEFLAGS     0x0L
+FILEOS        0x4L
+FILETYPE      0x1L
+FILESUBTYPE   0x0L
+BEGIN
+ BLOCK "StringFileInfo"
+ BEGIN
+  BLOCK "04090000"
+  BEGIN
+   VALUE "FileDescription",  "ckw"
+   VALUE "FileVersion",      VERSION_STRING
+   VALUE "InternalName",     "ckw"
+   VALUE "LegalCopyright",   COPYRIGHT_STRING
+   VALUE "OriginalFilename", "ckw.exe"
+   VALUE "ProductName",      "ck"
+   VALUE "ProductVersion",   VERSION_STRING
+  END
+ END
+END
