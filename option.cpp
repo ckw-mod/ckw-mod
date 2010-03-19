@@ -970,6 +970,7 @@ ckOpt::ckOpt()
 	m_isTranspColor = false;
 	m_transpColor = 0;
 	m_isTopMost = false;
+	m_config_file[0] = '\0';
 }
 
 ckOpt::~ckOpt()
@@ -1130,14 +1131,34 @@ void	ckOpt::_loadXdefaults(char *path)
 	fclose(fp);
 }
 
+void	ckOpt::setFile(char *path /*=NULL*/)
+{
+    if(path)
+    {
+        strcpy(m_config_file, path);
+    } else
+    {
+        m_config_file[0] = '\0';
+    }
+}
+
 void	ckOpt::loadXdefaults()
 {
 	char	path[MAX_PATH+1], *c;
 
-	GetModuleFileNameA(NULL, path, MAX_PATH);
-	c = strrchr(path, '.');
-	if(c) *c = 0;
-	strcat(path, ".cfg");
+    if(m_config_file[0] == '\0')
+    {
+        GetModuleFileNameA(NULL, path, MAX_PATH);
+        c = strrchr(path, '.');
+        if(c) *c = 0;
+        strcat(path, ".cfg");
+    }
+    else
+    {
+		path[0] = '\0';
+        strcpy(path, m_config_file);
+    }
+
 	_loadXdefaults(path);
 
 	if(GetEnvironmentVariableA("HOME", path, MAX_PATH)) {
