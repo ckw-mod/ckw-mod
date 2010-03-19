@@ -1087,7 +1087,7 @@ static void usage(bool isLong)
 		"ckw version " VERSION_STRING " , build " BUILDDATE_STRING "\n"
 		COPYRIGHT_STRING "\n"
 		"\n"
-		"Usage: ckw [options] [-e command args]\n"
+		"Usage: ckw [options] [-c configration file] [-e command args]\n"
 		"\n");
 
 	if(isLong) {
@@ -1173,7 +1173,7 @@ bool	ckOpt::set(int argc, char *argv[])
 	int	i = 1;
 
 	while(i < argc) {
-		if(!strcmp("-e", argv[i])) {
+		if(strcmp("-e", argv[i]) == 0) {
 			if(++i >= argc) {
 				usage(false);
 				return(false);
@@ -1181,13 +1181,23 @@ bool	ckOpt::set(int argc, char *argv[])
 			cmdsMake(argc-i, argv+i);
 			return(true);
 		}
-		if(!strcmp("-help", argv[i])) {
+		if(strcmp("-help", argv[i]) == 0) {
 			usage(false);
 			return(false);
 		}
-		if(!strcmp("--help", argv[i])) {
+		if(strcmp("--help", argv[i]) == 0) {
 			usage(true);
 			return(false);
+		}
+
+		if(strcmp("-c", argv[i]) == 0) {
+			if(++i >= argc) {
+				usage(false);
+				return(false);
+			}
+			setFile(argv[i]);
+			loadXdefaults();
+			skip = 1;
 		}
 
 		skip = setOption(argv[i], (i+1<argc) ? argv[i+1] : NULL, false);
