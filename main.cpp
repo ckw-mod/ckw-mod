@@ -358,8 +358,8 @@ static void __set_console_window_size(LONG cols, LONG rows)
 	if(cols == CSI_WndCols(&csi) && rows == CSI_WndRows(&csi))
 		return;
 
-	SMALL_RECT tmp = { 0,0,0,0 };
-	SetConsoleWindowInfo(gStdOut, TRUE, &tmp);
+	//SMALL_RECT tmp = { 0,0,0,0 };
+	//SetConsoleWindowInfo(gStdOut, TRUE, &tmp);
 
 	csi.dwSize.X = (SHORT)cols;
 	csi.srWindow.Left = 0;
@@ -803,6 +803,10 @@ static BOOL create_child_process(const char* cmd, const char* curdir)
 	si.hStdInput  = gStdIn;
 	si.hStdOutput = gStdOut;
 	si.hStdError  = gStdErr;
+
+	if (curdir)
+		if (char *p = strstr((char*)curdir, ":\""))
+			*(p+1) = '\\';
 
 	if(! CreateProcessA(NULL, buf, NULL, NULL, TRUE,
 			    0, NULL, curdir, &si, &pi)) {
