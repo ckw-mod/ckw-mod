@@ -917,10 +917,13 @@ static BOOL create_console(ckOpt& opt)
 	while((gConWnd = GetConsoleWindow()) == NULL) {
 		Sleep(10);
 	}
-	while(IsWindowVisible(gConWnd)) {
-		ShowWindow(gConWnd, SW_HIDE);
+
+	while(!IsWindowVisible(gConWnd)) {
 		Sleep(10);
 	}
+
+	ShowWindow(gConWnd, SW_HIDE);
+
 	SetConsoleTitle(title);
 
 	SetConsoleCtrlHandler(sig_handler, TRUE);
@@ -965,7 +968,7 @@ static BOOL create_console(ckOpt& opt)
 		fonts = GetNumberOfConsoleFonts();
 		if (fonts > MAX_FONTS)
 			fonts = MAX_FONTS;
-	
+
 		GetConsoleFontInfo(gStdOut, 0, fonts, font);
 		CONSOLE_FONT minimalFont = { 0, {0, 0}};
 		for(DWORD i=0;i<fonts;i++){
