@@ -822,9 +822,9 @@ static void extract(char *str, std::string& app, std::string& name, std::string&
 	app = str;
 	name = c1;
 	c4 = c2 + strlen(c2)-1;
-	for(        ; c2 < c4 && *c2<=' ' ; c2++);
-	for(c3 = c4 ; c3 > c2 && *c3<=' ' ; c3--);
-	if(*++c3 <= ' ') *c3 = 0;
+	for(        ; c2 < c4 && *c2<=' ' && *c2>0 ; c2++);
+	for(c3 = c4 ; c3 > c2 && *c3<=' ' && *c2>0 ; c3--);
+	if(*++c3 <= ' ' && *c3 > 0) *c3 = 0;
 	value = c2;
 }
 
@@ -1027,6 +1027,9 @@ int	ckOpt::setOption(const char *name, const char *value, bool rsrc)
 	CHK_MISC("transp",		"tr",		m_transp = atoi(value));
 	CHK_MISC("transpColor",		"trc",		m_isTranspColor = lookupColor(value,m_transpColor));
 	CHK_BOOL("topmost",		"top",		m_isTopMost);
+	CHK_MISC("chdir",		"cd",		m_curDir = value);
+	CHK_MISC("exec",		"x",		m_cmd = value);
+	CHK_MISC("title",		"tl",		m_title = value);
 
 	unsigned int i;
 	if(sscanf(name, "color%u", &i)==1 && 0<=i && i<=15) {
@@ -1073,6 +1076,9 @@ static void usage(bool isLong)
 	"transp",		"tr",		"number",	"alpha 0 ~ 255",
 	"transpColor",		"trc",		"color",	"color key",
 	"topmost",		"top",		"boolean",	"always on top",
+	"chdir",		"cd",		"string",	"set current dir",
+	"exec",			"x",		"string",	"exec shell",
+	"title",		"tl",		"string",	"window title",
 	};
 	unsigned int	i;
 
@@ -1131,7 +1137,7 @@ void	ckOpt::loadXdefaults()
 	GetModuleFileNameA(NULL, path, MAX_PATH);
 	c = strrchr(path, '.');
 	if(c) *c = 0;
-	strcat(path, ".txt");
+	strcat(path, ".cfg");
 	_loadXdefaults(path);
 
 	if(GetEnvironmentVariableA("HOME", path, MAX_PATH)) {

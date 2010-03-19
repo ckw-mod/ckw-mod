@@ -51,6 +51,14 @@ public:
 	{
 		return((m_bgBmp.size()) ? m_bgBmp.c_str() : NULL);
 	}
+	const char*	getCurDir()
+	{
+		return((m_curDir.size()) ? m_curDir.c_str() : NULL);
+	}
+	const char*	getTitle()
+	{
+		return((m_title.size()) ? m_title.c_str() : NULL);
+	}
 
 
 protected:
@@ -84,6 +92,8 @@ private:
 	bool		m_isTranspColor;
 	COLORREF	m_transpColor;
 	bool		m_isTopMost;
+	std::string	m_curDir;
+	std::string	m_title;
 };
 
 #endif /* __CK_OPT_H__ */

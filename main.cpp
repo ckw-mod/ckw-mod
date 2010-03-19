@@ -53,6 +53,22 @@ CONSOLE_SCREEN_BUFFER_INFO* gCSI = NULL;
 CHAR_INFO*	gScreen = NULL;
 wchar_t*	gTitle = NULL;
 
+/* setConsoleFont */
+#define MAX_FONTS 128
+
+typedef struct _CONSOLE_FONT {
+  DWORD index;
+  COORD dim;
+} CONSOLE_FONT, *PCONSOLE_FONT;
+
+typedef BOOL  (WINAPI *GetConsoleFontInfoT)( HANDLE,BOOL,DWORD,PCONSOLE_FONT );
+typedef DWORD (WINAPI *GetNumberOfConsoleFontsT)( VOID );
+typedef BOOL  (WINAPI *SetConsoleFontT)( HANDLE, DWORD );
+
+GetConsoleFontInfoT		GetConsoleFontInfo;
+GetNumberOfConsoleFontsT	GetNumberOfConsoleFonts;
+SetConsoleFontT			SetConsoleFont;
+
 /* index color */
 enum {
 	kColor0 = 0,
@@ -652,6 +668,8 @@ static BOOL create_window(ckOpt& opt)
 
 	HINSTANCE hInstance = GetModuleHandle(NULL);
 	LPWSTR	className = L"CkwWindowClass";
+	const char*	conf_title;
+	LPWSTR	title;
 	WNDCLASSEX wc;
 	DWORD	style = WS_OVERLAPPEDWINDOW;
 	DWORD	exstyle = WS_EX_ACCEPTFILES;
@@ -677,6 +695,15 @@ static BOOL create_window(ckOpt& opt)
 
 	if(opt.isIconic())
 		style |= WS_MINIMIZE;
+
+	conf_title = opt.getTitle();
+	if(!conf_title || !conf_title[0]){
+          title = L"ckw";
+        }else{
+          title = new wchar_t[ strlen(conf_title)+1 ];
+          ZeroMemory(title, sizeof(wchar_t) * (strlen(conf_title)+1));
+          MultiByteToWideChar(CP_ACP, 0, conf_title, strlen(conf_title), title, sizeof(wchar_t) * (strlen(conf_title)+1));
+        }
 
 	/* calc window size */
 	CONSOLE_SCREEN_BUFFER_INFO csi;
@@ -731,11 +758,13 @@ static BOOL create_window(ckOpt& opt)
 	if(! RegisterClassEx(&wc))
 		return(FALSE);
 
-	HWND hWnd = CreateWindowEx(exstyle, className, L"ckw", style,
+	HWND hWnd = CreateWindowEx(exstyle, className, title, style,
 				   posx, posy, width, height,
 				   NULL, NULL, hInstance, NULL);
-	if(!hWnd)
+	if(!hWnd){
+		delete [] title;
 		return(FALSE);
+        }
 
 	sysmenu_init(hWnd);
 
@@ -749,7 +778,7 @@ static BOOL create_window(ckOpt& opt)
 }
 
 /*----------*/
-static BOOL create_child_process(const char* cmd)
+static BOOL create_child_process(const char* cmd, const char* curdir)
 {
 	trace("create_child_process\n");
 
@@ -776,7 +805,7 @@ static BOOL create_child_process(const char* cmd)
 	si.hStdError  = gStdErr;
 
 	if(! CreateProcessA(NULL, buf, NULL, NULL, TRUE,
-			    0, NULL, NULL, &si, &pi)) {
+			    0, NULL, curdir, &si, &pi)) {
 		delete [] buf;
 		return(FALSE);
 	}
@@ -871,6 +900,18 @@ BOOL WINAPI sig_handler(DWORD n)
 
 static BOOL create_console(ckOpt& opt)
 {
+	const char*	conf_title;
+	LPWSTR	title;
+
+	conf_title = opt.getTitle();
+	if(!conf_title || !conf_title[0]){
+          title = L"ckw";
+        }else{
+          title = new wchar_t[ strlen(conf_title)+1 ];
+          ZeroMemory(title, sizeof(wchar_t) * (strlen(conf_title)+1));
+          MultiByteToWideChar(CP_ACP, 0, conf_title, strlen(conf_title), title, sizeof(wchar_t) * (strlen(conf_title)+1));
+        }
+
 	__hide_alloc_console();
 
 	while((gConWnd = GetConsoleWindow()) == NULL) {
@@ -880,7 +921,7 @@ static BOOL create_console(ckOpt& opt)
 		ShowWindow(gConWnd, SW_HIDE);
 		Sleep(10);
 	}
-	SetConsoleTitle(L"ckw");
+	SetConsoleTitle(title);
 
 	SetConsoleCtrlHandler(sig_handler, TRUE);
 
@@ -901,6 +942,41 @@ static BOOL create_console(ckOpt& opt)
 
 	if(!gConWnd || !gStdIn || !gStdOut || !gStdErr)
 		return(FALSE);
+
+	HINSTANCE hLib;
+	hLib = LoadLibraryW( L"KERNEL32.DLL" );
+	if (hLib == NULL)
+		goto done;
+
+	#define GetProc( proc ) \
+	do { \
+		proc = (proc##T)GetProcAddress( hLib, #proc ); \
+		if (proc == NULL) \
+			goto freelib; \
+	} while (0)
+	GetProc( GetConsoleFontInfo );
+	GetProc( GetNumberOfConsoleFonts );
+	GetProc( SetConsoleFont );
+	#undef GetProc
+
+	{
+		CONSOLE_FONT font[MAX_FONTS];
+		DWORD fonts;
+		fonts = GetNumberOfConsoleFonts();
+		if (fonts > MAX_FONTS)
+			fonts = MAX_FONTS;
+	
+		GetConsoleFontInfo(gStdOut, 0, fonts, font);
+		CONSOLE_FONT minimalFont = { 0, {0, 0}};
+		for(DWORD i=0;i<fonts;i++){
+			if(minimalFont.dim.X < font[i].dim.X && minimalFont.dim.Y < font[i].dim.Y)
+				minimalFont = font[i];
+		}
+		SetConsoleFont(gStdOut, minimalFont.index);
+	}
+	freelib:
+		FreeLibrary( hLib );
+	done:
 
 	/* set buffer & window size */
 	COORD size;
@@ -989,7 +1065,7 @@ static BOOL initialize()
 		trace("create_font failed\n");
 		return(FALSE);
 	}
-	if(! create_child_process(opt.getCmd())) {
+	if(! create_child_process(opt.getCmd(), opt.getCurDir())) {
 		trace("create_child_process failed\n");
 		return(FALSE);
 	}

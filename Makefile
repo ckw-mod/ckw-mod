@@ -1,8 +1,8 @@
 TARGET = ckw.exe
 OBJ = main.obj selection.obj misc.obj option.obj ime_wrap.obj rsrc.res
 
-#CFLAGS = -nologo -MLd -Od -W3 -Wp64 -GX -D_DEBUG
-CFLAGS = -nologo -MT -O2 -W3 -Wp64 -GX -DNDEBUG
+#CFLAGS = -nologo -MLd -Od -W3 -GX -D_DEBUG
+CFLAGS = -nologo -MT -O2 -W3 -EHsc -DNDEBUG
 LDFLAGS = -nologo
 
 UINC = 
@@ -13,7 +13,7 @@ ULIB = user32.lib gdi32.lib shell32.lib
 all: ver $(TARGET)
 
 ver:
-	./version.sh > version.h
+	version.bat > version.h
 
 $(TARGET): $(OBJ)
 	link $(LDFLAGS) -out:$@ $(OBJ) $(ULIB)
@@ -23,4 +23,4 @@ $(TARGET): $(OBJ)
 .rc.res:
 	rc -l 0x409 -fo $@ $<
 clean:
-	rm -f $(OBJ) $(TARGET) *~
+	del $(OBJ) $(TARGET)
