@@ -24,6 +24,7 @@
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
+				CommandLine="&quot;$(InputDir)..\version.bat&quot; &gt; &quot;$(InputDir)..\version.h&quot;"
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
@@ -92,6 +93,7 @@
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
+				CommandLine="&quot;$(InputDir)..\version.bat&quot; &gt; &quot;$(InputDir)..\version.h&quot;"
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
