@@ -1,5 +1,17 @@
 ckw-mod変更点
 
+----- 2009/11/18 -----
+
+http://twitter.com/you_and_i/status/5812581561 での修正を取り込みました。(bleis-tift)
+これで、XP でも Vista でも動くようになったはずです。
+また、VC++2005再頒布可能パッケージなしでも動作するようにしました。
+id:youandi さん、id:DigitalGhost さん、id:pasela さん、ありがとうございます。
+
+----- 2009/11/17 -----
+
+http://d.hatena.ne.jp/s-yata/20080823/1219474577 での修正を取り込みました。(bleis-tift)
+id:hideden さん、 id:s-yata さん、そしてオリジナル作者の Kazuo Ishii さん、ありがとうございます。
+
 ----- 2007/11/23 -----
 
 nocd5さんのblogで指摘していただいた
@@ -61,3 +73,4 @@ Ckw*exec: cmd.exe /K DATE
 
 
 2007/11/15 hideden <mail@hideden.net>
+2009/11/17 bleis-tift <http://d.hatena.ne.jp/bleis-tift/>
