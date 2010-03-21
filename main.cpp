@@ -922,7 +922,8 @@ static BOOL create_console(ckOpt& opt)
 		Sleep(10);
 	}
 	// ‚±‚Ìƒ‹[ƒv‚ğ’Ç‰Á
-	while(!IsWindowVisible(gConWnd)) {
+	for(int i=0;!IsWindowVisible(gConWnd) && i<100;i++)
+	{
 	  Sleep(10);
 	}
 	while(IsWindowVisible(gConWnd)) {
