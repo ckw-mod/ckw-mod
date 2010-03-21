@@ -921,18 +921,14 @@ static BOOL create_console(ckOpt& opt)
 	while((gConWnd = GetConsoleWindow()) == NULL) {
 		Sleep(10);
 	}
-	// ‚±‚Ìƒ‹[ƒv‚ğ’Ç‰Á
-	for(int i=0;!IsWindowVisible(gConWnd) && i<100;i++)
-	{
-	  Sleep(10);
+	ShowWindow(gConWnd, SW_SHOW);
+	while (!IsWindowVisible(gConWnd)) {
+		Sleep(10);
 	}
 	while(IsWindowVisible(gConWnd)) {
 		ShowWindow(gConWnd, SW_HIDE);
 		Sleep(10);
 	}
-
-	ShowWindow(gConWnd, SW_HIDE);
-
 	SetConsoleTitle(title);
 
 	SetConsoleCtrlHandler(sig_handler, TRUE);
