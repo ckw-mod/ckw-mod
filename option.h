@@ -10,7 +10,7 @@ public:
 	ckOpt();
 	~ckOpt();
 
-	void		setFile(char *path=NULL);
+	void		setFile(const char *path=NULL);
 	void		loadXdefaults();
 	bool		set(int argc, char *argv[]);
 
@@ -66,7 +66,7 @@ protected:
 	void	cmdsMake(int argc, char *argv[]);
 	void	geometry(const char *str);
 	int	setOption(const char *name, const char *value, bool rsrc);
-	void	_loadXdefaults(char *path);
+	void	_loadXdefaults(const char *path);
 
 private:
 	bool		m_isWinPos;
