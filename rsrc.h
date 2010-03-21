@@ -11,3 +11,4 @@
 /* ... 50003, 50004, ...  */
 #define IDM_CONFIG_SELECT_MAX	50100
 #define IDM_NEW	60001
+#define IDM_TOPMOST	70001

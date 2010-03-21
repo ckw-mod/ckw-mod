@@ -150,7 +150,9 @@ L" 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA."
 }
 
 /*----------*/
+void	sysmenu_init_topmost(HWND hWnd, HMENU hMenu);
 void	sysmenu_init_subconfig(HWND hWnd, HMENU hMenu);
+void	changeStateTopMostMenu(HWND hWnd, HMENU hMenu);
 
 void	sysmenu_init(HWND hWnd)
 {
@@ -167,7 +169,9 @@ void	sysmenu_init(HWND hWnd)
 	mii.cch = (UINT) wcslen(mii.dwTypeData);
 	InsertMenuItem(hMenu, SC_CLOSE, FALSE, &mii);
 
-    sysmenu_init_subconfig(hWnd, hMenu);
+	sysmenu_init_topmost(hWnd, hMenu);
+
+    // sysmenu_init_subconfig(hWnd, hMenu);
 
 	mii.fType = MFT_SEPARATOR;
 	mii.wID = 0;
@@ -194,6 +198,24 @@ void    get_directory_path(wchar_t *path)
 	GetModuleFileName(NULL, path, MAX_PATH);
 	c = wcsrchr(path, L'\\');
 	if(c) *c = 0;
+}
+
+void	sysmenu_init_topmost(HWND hWnd, HMENU hMenu)
+{
+	MENUITEMINFO mii;
+
+	memset(&mii, 0, sizeof(mii));
+	mii.cbSize = sizeof(mii);
+	mii.fMask = MIIM_TYPE | MIIM_ID | MIIM_CHECKMARKS;
+
+	mii.fType = MFT_STRING;
+	mii.wID = IDM_TOPMOST;
+	mii.dwTypeData = L"TopMost (&T)";
+	mii.cch = (UINT) wcslen(mii.dwTypeData);
+
+	InsertMenuItem(hMenu, SC_CLOSE, FALSE, &mii);
+
+	changeStateTopMostMenu(hWnd,hMenu);
 }
 
 void	sysmenu_init_subconfig(HWND hWnd, HMENU hMenu)
@@ -274,6 +296,35 @@ BOOL    onConfigMenuCommand(HWND hWnd, DWORD id)
     return(TRUE);
 }
 
+BOOL	onTopMostMenuCommand(HWND hWnd)
+{
+	HMENU hMenu = GetSystemMenu(hWnd, FALSE);
+
+	UINT uState = GetMenuState( hMenu, IDM_TOPMOST, MF_BYCOMMAND);
+	DWORD dwExStyle = GetWindowLong(hWnd,GWL_EXSTYLE);
+	if( uState & MFS_CHECKED )
+	{
+		SetWindowPos(hWnd, HWND_NOTOPMOST,NULL,NULL,NULL,NULL,SWP_NOMOVE | SWP_NOSIZE); 
+	}else{
+		SetWindowPos(hWnd, HWND_TOPMOST,NULL,NULL,NULL,NULL,SWP_NOMOVE | SWP_NOSIZE); 
+	}
+
+	changeStateTopMostMenu(hWnd, hMenu);
+
+	return(TRUE);
+}
+
+void	changeStateTopMostMenu(HWND hWnd,HMENU hMenu)
+{
+	DWORD dwExStyle = GetWindowLong(hWnd,GWL_EXSTYLE);
+
+	if ((dwExStyle & WS_EX_TOPMOST) == 0) {
+		CheckMenuItem(hMenu, IDM_TOPMOST, MF_BYCOMMAND | MFS_UNCHECKED);
+	} else {
+		CheckMenuItem(hMenu, IDM_TOPMOST, MF_BYCOMMAND | MFS_CHECKED);
+	}
+}
+
 /*----------*/
 BOOL	onSysCommand(HWND hWnd, DWORD id)
 {
@@ -287,6 +338,8 @@ BOOL	onSysCommand(HWND hWnd, DWORD id)
 	case IDM_NEW:
 		makeNewWindow();
 		return(TRUE);
+	case IDM_TOPMOST:
+		return onTopMostMenuCommand(hWnd);
 	}
     if(IDM_CONFIG_SELECT < id && id <= IDM_CONFIG_SELECT_MAX) {
         return onConfigMenuCommand(hWnd, id);
