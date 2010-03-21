@@ -1,23 +1,30 @@
 2010-03-21  deflis
-    Version 0.8.10-mod+deflis
+    Version 0.8.10-mod+deflis-3
+    * XPパッチをmod3のものに切り替え。どっちがいいのかはわからない。
+
+2010-03-21  deflis
+    Version 0.8.10-mod+deflis-2
     * コンソール隠しに失敗する場合のパッチを適用するとXPで上手く動かないのを修正。
     * メニューバーで新しいウインドウを開けるようにした。
     * cfg切り替えを正規の方法で実装した。
 
 2010-03-19  deflis
-    Version 0.8.10-mod+deflis
+    Version 0.8.10-mod+deflis (shimizukawa's mod based)
     * コンソール隠しに失敗する場合のパッチをs-yata氏のものに切り替え。
       http://d.hatena.ne.jp/s-yata/20080823/1219474577
     * コマンドラインパラメータによるcfg切り替えの実装（中途半端）。
 
 2009-11-18 bleis-tift
     Version 0.8.10-mod3 (mod2 based)
+    * http://d.hatena.ne.jp/s-yata/20080823/1219474577 での修正を取り込み。
     * http://twitter.com/you_and_i/status/5812581561 での修正を取り込み。
+      http://d.hatena.ne.jp/bleis-tift/20091117/1258448920
 
 2009-10-19  shimizukawa
-    Unreleased
+    Unreleased (mod-mod based)
     * 文字コードとして'\r\n'をクリップボードから貼り付けたときに、データ受け取る実行中プログラムが、VK_RETURNとして処理しない場合がある。このため、\rを無視し、\nをVK_RETURNとして扱うようにしてみた。
     * タイトルバー右クリックでのcfg切り替えは実装途中。
+      http://www.freia.jp/taka/blog/678/
 
 2008-10-15  shuujin
     Version 0.8.10-mod-mod

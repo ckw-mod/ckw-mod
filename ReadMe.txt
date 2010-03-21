@@ -33,3 +33,6 @@
 
   「Console」を参考にさせて頂きました。
   http://sourceforge.net/projects/console/
+
+  改変版を作るにあたって多数の方のパッチを取り込ませていただきました。
+  この場をお借りしてお礼申し上げます。

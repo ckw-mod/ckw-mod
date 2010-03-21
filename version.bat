@@ -3,7 +3,7 @@ set VERSION_MAJOR=0
 set VERSION_MINOR=8
 set VERSION_BGFIX=10
 set VERSION_NUM=008101
-set VERSION_MOD=deflis-2
+set VERSION_MOD=deflis-3
 set DATE=%date% %time:~0,8% UTC+9
 
 echo #define VERSION_MAJOR %VERSION_MAJOR%
