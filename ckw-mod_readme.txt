@@ -1,63 +1,63 @@
-ckw-mod�ύX�_
+ckw-mod変更点
 
 ----- 2007/11/23 -----
 
-nocd5�����blog�Ŏw�E���Ă���������
-�E-cd "%1" �Ńh���C�u���[�g���w�肷��ƋN�����Ȃ��o�O
-�EbbLean��window��shade����ƍŏ������Ă��܂��o�O
+nocd5さんのblogで指摘していただいた
+・-cd "%1" でドライブルートを指定すると起動しないバグ
+・bbLeanでwindowをshadeすると最小化してしまうバグ
 
-���C������p�b�`�𓖂ĂăR���p�C���������̂ɍ����ւ��܂����B���肪�Ƃ��������܂��B
+を修正するパッチを当ててコンパイルしたものに差し替えました。ありがとうございます。
 
 
 ----- 2007/11/15 -----
 
-�E�ݒ�t�@�C�� ckw.txt �� ckw.cfg �ɕύX���܂����B(�l�I�ȍD�݂ł��B)
-�EMakefile����Cygwin�ˑ��̃V�F���X�N���v�g��r�����Abat�݂̂Ŏ��s�ł���悤�ɂ���
-  VC�݂̂ŃR���p�C���ł���悤�ɂ��܂����B
-�E�J�����g�f�B���N�g�����w�肷��-cd,--chdir ��ǉ����܂����B
-�E���s�V�F����ݒ�t�@�C���ɋL�q�ł���悤�ɂ��܂����B
-�E�^�C�g�����w�肷��I�v�V����-tl,--title��ǉ����܂����B
-�E�t�H���g�T�C�Y���������ݒ肷��ƁA�ő剻����Window���T�C�Y���Ɉ��ȏ�̑傫���ɂ����
-  �E�B���h�E�T�C�Y�����������Ȃ��Ă��܂��s���(����)�C�����܂����B
+・設定ファイル ckw.txt → ckw.cfg に変更しました。(個人的な好みです。)
+・MakefileからCygwin依存のシェルスクリプトを排除し、batのみで実行できるようにして
+  VCのみでコンパイルできるようにしました。
+・カレントディレクトリを指定する-cd,--chdir を追加しました。
+・実行シェルを設定ファイルに記述できるようにしました。
+・タイトルを指定するオプション-tl,--titleを追加しました。
+・フォントサイズを小さく設定すると、最大化時やWindowリサイズ時に一定以上の大きさにすると
+  ウィンドウサイズがおかしくなってしまう不具合を(多分)修正しました。
 
-����m�F�͓��{���WindowsXP Pro SP2�ł݂̂����Ȃ��Ă���܂��B
-�܂��A�o�C�i����VC8(VS2005)�ŃR���p�C�����Ă���܂��B
+動作確認は日本語版WindowsXP Pro SP2でのみおこなっております。
+また、バイナリはVC8(VS2005)でコンパイルしてあります。
 
 
-�ݒ�t�@�C������
+設定ファイル中に
 
 Ckw*chdir: c:\
 
-�Ƃ����ƁA�J�����g�f�B���N�g�����ړ����ăV�F�����N�����܂��B�܂��A�R�}���h���C���Ŏw�肷��ꍇ��
+とかくと、カレントディレクトリを移動してシェルを起動します。また、コマンドラインで指定する場合は
 
 ckw -cd c:\
- �܂���
+ または
 ckw --chdir c:\
 
-�Ƃ��Ă��������B
+としてください。
 
 
 
-�ݒ�t�@�C������
+設定ファイル中で
 
-Ckw*title: �R���\�[��
+Ckw*title: コンソール
 
-�Ƃ���ƁA�^�C�g����ύX�ł��܂��B�f�t�H���g��"ckw"�ł��B
-�ݒ�t�@�C����SJIS�ŕۑ����Ă��������B
+とすると、タイトルを変更できます。デフォルトは"ckw"です。
+設定ファイルはSJISで保存してください。
 
 
 
 Ckw*exec: C:\shell\nyacus.exe
 
-���Ƃ���ƋN������V�F����ݒ�t�@�C���Œ�`�ł��܂��B-e���l�A�N���I�v�V�������L�q�ł��܂��B
+等とすると起動するシェルを設定ファイルで定義できます。-e同様、起動オプションも記述できます。
 
 Ckw*exec: cmd.exe /K DATE
 
 
 
-�܂��A���X�̎d�l�Ƃ��Đݒ�t�@�C���͎��s�t�@�C�����̊g���q��.cfg�ɂ������̂����ɍs���܂��̂ŁA
-�����̃V�F�����g��������ꍇ�͎��s�t�@�C����ckw2.exe���ƃ��l�[�����Ackw2.cfg�ɕʐݒ���L�q����
-���������B
+また、元々の仕様として設定ファイルは実行ファイル名の拡張子を.cfgにしたものを見に行きますので、
+複数のシェルを使い分ける場合は実行ファイルをckw2.exe等とリネームし、ckw2.cfgに別設定を記述して
+ください。
 
 
 2007/11/15 hideden <mail@hideden.net>

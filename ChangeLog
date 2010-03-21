@@ -1,92 +1,98 @@
-2009-10-19  deflis
+2010-03-21  deflis
     Version 0.8.10-mod+deflis
-    * �R���\�[���B���Ɏ��s����ꍇ�̃p�b�`��s-yata���̂��̂ɐ؂�ւ��B
+    * コンソール隠しに失敗する場合のパッチを適用するとXPで上手く動かないのを修正。	
+    * メニューバーで新しいウインドウを開けるようにした。
+    * cfg切り替えを正規の方法で実装した。
+
+2010-03-19  deflis
+    Version 0.8.10-mod+deflis
+    * コンソール隠しに失敗する場合のパッチをs-yata氏のものに切り替え。
       http://d.hatena.ne.jp/s-yata/20080823/1219474577
-    * �R�}���h���C���p�����[�^�ɂ��cfg�؂�ւ��̎����i���r���[�j�B
+    * コマンドラインパラメータによるcfg切り替えの実装（中途半端）。
 
 2009-10-19  shimizukawa
     Unreleased
-    * �����R�[�h�Ƃ���'\r\n'���N���b�v�{�[�h����\��t�����Ƃ��ɁA�f�[�^�󂯎����s���v���O�������AVK_RETURN�Ƃ��ď������Ȃ��ꍇ������B���̂��߁A\r�𖳎����A\n��VK_RETURN�Ƃ��Ĉ����悤�ɂ��Ă݂��B
-    * �^�C�g���o�[�E�N���b�N�ł�cfg�؂�ւ��͎����r���B
+    * 文字コードとして'\r\n'をクリップボードから貼り付けたときに、データ受け取る実行中プログラムが、VK_RETURNとして処理しない場合がある。このため、\rを無視し、\nをVK_RETURNとして扱うようにしてみた。
+    * タイトルバー右クリックでのcfg切り替えは実装途中。
 
 2008-10-15  shuujin
     Version 0.8.10-mod-mod
-    * 10��9��̓R���\�[���B���Ɏ��s���ĕs�׍H�ȃR���\�[���������Ă��������C���B
+    * 10回中9回はコンソール隠しに失敗して不細工なコンソールが見えていた問題を修正。
       http://blogs.wankuma.com/shuujin/archive/2008/10/15/158825.aspx
 
 2007-11-23  hideden
     Version 0.8.10-mod2
-    * �E�N���b�N���j���[���� ckw.exe -cd "%1" ���Ɠo�^���� C:\���h���C�u�̒����ŊJ�����Ƃ����ckw���J���Ȃ������C��
+    * 右クリックメニュー等に ckw.exe -cd "%1" 等と登録して C:\等ドライブの直下で開こうとするとckwが開けない問題を修正
       http://nocd5.blog59.fc2.com/blog-entry-195.html
 
 2007-11-15  hideden
     Version 0.8.10-mod
-    * �ݒ�t�@�C������ ckw.txt �� ckw.cfg �ɕύX (�l�I�ȍD�݂ł��B)
-    * Makefile����Cygwin�ˑ��̃V�F���X�N���v�g��bat�ɏ��������AVC�ŃR���p�C���ł���悤�ɂ���
-    * �J�����g�f�B���N�g�����w�肷��-cd,--chdir ��ǉ�
-        * -e cmd.exe /K cd c:\�Ƃ��ł��s���邪�A���V�F�����ł��y�ɂ��邽�߁B
-    * ���s�V�F����ݒ�t�@�C���ɋL�q�ł���悤�ɂ���
-        * -e�I�v�V�����Ŏw��ł��Ă������A�V���[�g�J�b�g��������̂��ʓ|���������߁B
-    * �^�C�g�����w�肷��I�v�V����-tl,--title��ǉ�
-        * cmd�p��nyacus�p���������₷���������āB
-    * �t�H���g�T�C�Y��W����DOS����菬�����ݒ肷��ƁA�ő剻�⑋���T�C�Y�ň��ȏ�̑傫���ɂȂ�ƃE�B���h�E�T�C�Y�����������Ȃ��Ă��܂��s����C��(����)
-        * MS Gothic 12�ōő剻����ƂȂ񂩃^�C�g���o�[�݂̂̏����ȑ��ɂȂ��Ă��܂��Ă����B
+    * 設定ファイル名を ckw.txt → ckw.cfg に変更 (個人的な好みです。)
+    * MakefileからCygwin依存のシェルスクリプトをbatに書き換え、VCでコンパイルできるようにした
+    * カレントディレクトリを指定する-cd,--chdir を追加
+        * -e cmd.exe /K cd c:\とかでも行けるが、他シェル等でも楽にするため。
+    * 実行シェルを設定ファイルに記述できるようにした
+        * -eオプションで指定できていたが、ショートカットをいじるのが面倒だったため。
+    * タイトルを指定するオプション-tl,--titleを追加
+        * cmd用とnyacus用を見分けやすくしたくて。
+    * フォントサイズを標準のDOS窓より小さく設定すると、最大化や窓リサイズで一定以上の大きさになるとウィンドウサイズがおかしくなってしまう不具合を修正(多分)
+        * MS Gothic 12で最大化するとなんかタイトルバーのみの小さな窓になってしまっていた。
 
 2005-10-27  Kazuo Ishii  <k-ishii@wb4.so-net.ne.jp>
 	Version 0.8.10
 	* main.cpp
-	DOS�����m���ɏ�����܂ő҂悤�ɂ����B
+	DOS窓が確実に消えるまで待つようにした。
 
 2005-09-08  Kazuo Ishii  <k-ishii@wb4.so-net.ne.jp>
 	Version 0.8.9
 	* main.cpp
-	screen buffer���琳�����ǂݎ�ꂸ��ʕ\��������邱�Ƃ��������B
+	screen bufferから正しく読み取れず画面表示が乱れることがあった。
 
 2005-09-06  Kazuo Ishii  <k-ishii@wb4.so-net.ne.jp>
 	Version 0.8.8
 	* main.cpp
-	�A�v��������̃E�B���h�E�T�C�Y�ύX�ɑΉ��B
+	アプリ側からのウィンドウサイズ変更に対応。
 
 2005-07-06  Kazuo Ishii  <k-ishii@wb4.so-net.ne.jp>
 	Version 0.8.7
 	* main.cpp
 	* selection.cpp
 	* ckw.h
-	�Q�o�C�g�����̕\�����Y���Ă��܂���������̂őΏ��B
-	�iReadConsoleOutputA���g���悤�ɂ����j
+	２バイト文字の表示がズレてしまう環境があるので対処。
+	（ReadConsoleOutputAを使うようにした）
 
 2005-07-04  Kazuo Ishii  <k-ishii@wb4.so-net.ne.jp>
 	Version 0.8.6
 	* main.cpp
-	ReadConsoleOutput�ŗ����邱�Ƃ�����̂� �񐔂����炵�ė����ɂ��������B
+	ReadConsoleOutputで落ちることがあるので 回数を減らして落ちにくくした。
 
 2005-06-14  Kazuo Ishii  <k-ishii@wb4.so-net.ne.jp>
 	Version 0.8.5
 	* main.cpp
-	ckw�{�̂� Ctrl-C�ŏI�����Ă��܂��o�O���C���B
+	ckw本体が Ctrl-Cで終了してしまうバグを修正。
 
 2005-06-09  Kazuo Ishii  <k-ishii@wb4.so-net.ne.jp>
 	Version 0.8.4
 	* main.cpp
-	IME���͒��A���E�B���h�E�Ȃǂ��\������Ȃ������B
+	IME入力中、候補ウィンドウなどが表示されなかった。
 
 2005-05-25  Kazuo Ishii  <k-ishii@wb4.so-net.ne.jp>
 	Version 0.8.3
 	* main.cpp
-	�����w�i�F���K�p����ĂȂ������B
-	�X�N���[���o�b�t�@�̍����ւ��ɑΉ����ĂȂ������B
+	文字背景色が適用されてなかった。
+	スクリーンバッファの差し替えに対応してなかった。
 
 2005-05-14  Kazuo Ishii  <k-ishii@wb4.so-net.ne.jp>
 	Version 0.8.2
 	* main.cpp
-	WindowsXP�ł����{��̂Q�o�C�g�t���O���t���Ȃ���������悤�Ȃ̂ŁA
-	��ɑS�p���`�F�b�N����悤�ɂ����B
+	WindowsXPでも日本語の２バイトフラグが付かない環境があるようなので、
+	常に全角かチェックするようにした。
 
 2005-04-30  Kazuo Ishii  <k-ishii@wb4.so-net.ne.jp>
 	Version 0.8.1
 	* main.cpp
 	* selection.cpp
-	Windows2000�œ��{�ꂪ�������\���ł��ĂȂ�����
+	Windows2000で日本語が正しく表示できてなかった
 
 2005-04-24  Kazuo Ishii  <k-ishii@wb4.so-net.ne.jp>
 	Version 0.8.0
