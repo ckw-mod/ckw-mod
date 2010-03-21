@@ -1086,9 +1086,11 @@ static BOOL initialize()
 		return(FALSE);
 	}
 
+	/*
 	wchar_t path[MAX_PATH+1];
 	GetSystemDirectory(path, MAX_PATH);
 	SetCurrentDirectory(path);
+	*/
 	return(TRUE);
 }
 
@@ -1154,6 +1156,26 @@ int APIENTRY wWinMain(HINSTANCE hInst, HINSTANCE hPrev, LPWSTR lpCmdLine, int nC
 	}
 	_terminate();
 	return(0);
+}
+
+/* 新規ウインドウの作成 */
+void makeNewWindow()
+{
+	LPWSTR cd = new TCHAR[MAX_PATH+1];
+	GetCurrentDirectory(MAX_PATH, cd);
+
+	STARTUPINFO si;
+	ZeroMemory(&si, sizeof(si));
+	si.cb = sizeof(si);
+
+	PROCESS_INFORMATION pi;
+	ZeroMemory(&pi, sizeof(pi));
+	if(CreateProcess(NULL, GetCommandLine(), NULL, NULL, FALSE, 0,
+					   NULL, NULL, &si, &pi)){
+		// 使用しないので，すぐにクローズしてよい
+		CloseHandle(pi.hProcess);
+		CloseHandle(pi.hThread);
+	}
 }
 
 /* EOF */

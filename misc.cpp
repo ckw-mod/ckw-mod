@@ -162,12 +162,24 @@ void	sysmenu_init(HWND hWnd)
 	mii.fMask = MIIM_TYPE | MIIM_ID;
 
 	mii.fType = MFT_STRING;
-	mii.wID = IDM_ABOUT;
-	mii.dwTypeData = L"About (&A)";
+	mii.wID = IDM_NEW;
+	mii.dwTypeData = L"New (&N)";
 	mii.cch = (UINT) wcslen(mii.dwTypeData);
 	InsertMenuItem(hMenu, SC_CLOSE, FALSE, &mii);
 
     sysmenu_init_subconfig(hWnd, hMenu);
+
+	mii.fType = MFT_SEPARATOR;
+	mii.wID = 0;
+	mii.dwTypeData = 0;
+	mii.cch = 0;
+	InsertMenuItem(hMenu, SC_CLOSE, FALSE, &mii);
+
+	mii.fType = MFT_STRING;
+	mii.wID = IDM_ABOUT;
+	mii.dwTypeData = L"About (&A)";
+	mii.cch = (UINT) wcslen(mii.dwTypeData);
+	InsertMenuItem(hMenu, SC_CLOSE, FALSE, &mii);
 
 	mii.fType = MFT_SEPARATOR;
 	mii.wID = 0;
@@ -271,6 +283,9 @@ BOOL	onSysCommand(HWND hWnd, DWORD id)
 			  MAKEINTRESOURCE(IDD_DIALOG1),
 			  hWnd,
 			  AboutDlgProc);
+		return(TRUE);
+	case IDM_NEW:
+		makeNewWindow();
 		return(TRUE);
 	}
     if(IDM_CONFIG_SELECT < id && id <= IDM_CONFIG_SELECT_MAX) {
