@@ -1031,6 +1031,8 @@ int	ckOpt::setOption(const char *name, const char *value, bool rsrc)
 	CHK_MISC("chdir",		"cd",		m_curDir = value);
 	CHK_MISC("exec",		"x",		m_cmd = value);
 	CHK_MISC("title",		"tl",		m_title = value);
+	CHK_MISC("config",		"c",		setFile(value);loadXdefaults() );
+
 
 	unsigned int i;
 	if(sscanf(name, "color%u", &i)==1 && 0<=i && i<=15) {
@@ -1080,6 +1082,7 @@ static void usage(bool isLong)
 	"chdir",		"cd",		"string",	"set current dir",
 	"exec",			"x",		"string",	"exec shell",
 	"title",		"tl",		"string",	"window title",
+	"config",		"c",		"string",	"configration file",
 	};
 	unsigned int	i;
 
@@ -1104,7 +1107,7 @@ static void usage(bool isLong)
 	}
 }
 
-void	ckOpt::_loadXdefaults(char *path)
+void	ckOpt::_loadXdefaults(const char *path)
 {
 	char	buf[512];
 	FILE	*fp;
@@ -1131,7 +1134,7 @@ void	ckOpt::_loadXdefaults(char *path)
 	fclose(fp);
 }
 
-void	ckOpt::setFile(char *path /*=NULL*/)
+void	ckOpt::setFile(const char *path /*=NULL*/)
 {
     if(path)
     {
@@ -1188,16 +1191,6 @@ bool	ckOpt::set(int argc, char *argv[])
 		if(strcmp("--help", argv[i]) == 0) {
 			usage(true);
 			return(false);
-		}
-
-		if(strcmp("-c", argv[i]) == 0) {
-			if(++i >= argc) {
-				usage(false);
-				return(false);
-			}
-			setFile(argv[i]);
-			loadXdefaults();
-			skip = 1;
 		}
 
 		skip = setOption(argv[i], (i+1<argc) ? argv[i+1] : NULL, false);
