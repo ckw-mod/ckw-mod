@@ -870,6 +870,8 @@ static BOOL create_font(const char* name, int height)
 /*----------*/
 static void __hide_alloc_console()
 {
+	bool bResult = false;
+
 	/*
 	 * Open Console Window
 	 * hack StartupInfo.wShowWindow flag
@@ -887,6 +889,7 @@ static void __hide_alloc_console()
 	if(si.dwFlags == backup_flags && si.wShowWindow == backup_show) {
 		*pflags |= STARTF_USESHOWWINDOW;
 		*pshow  = SW_HIDE;
+		bResult = true;
 	}
 
 	AllocConsole();
@@ -894,6 +897,21 @@ static void __hide_alloc_console()
 	/* restore */
 	*pflags = backup_flags;
 	*pshow  = backup_show;
+
+	
+	while((gConWnd = GetConsoleWindow()) == NULL) {
+		Sleep(10);
+	}
+
+	if (!bResult){
+		while (!IsWindowVisible(gConWnd)) {
+			Sleep(10);
+		}
+		while(IsWindowVisible(gConWnd)) {
+			ShowWindow(gConWnd, SW_HIDE);
+			Sleep(10);
+		}
+	}
 }
 
 /*----------*/
@@ -918,17 +936,6 @@ static BOOL create_console(ckOpt& opt)
 
 	__hide_alloc_console();
 
-	while((gConWnd = GetConsoleWindow()) == NULL) {
-		Sleep(10);
-	}
-	ShowWindow(gConWnd, SW_SHOW);
-	while (!IsWindowVisible(gConWnd)) {
-		Sleep(10);
-	}
-	while(IsWindowVisible(gConWnd)) {
-		ShowWindow(gConWnd, SW_HIDE);
-		Sleep(10);
-	}
 	SetConsoleTitle(title);
 
 	SetConsoleCtrlHandler(sig_handler, TRUE);
