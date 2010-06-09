@@ -587,6 +587,21 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 		break;
 	case WM_MOUSEMOVE:
 		onMouseMove(hWnd, (short)LOWORD(lp),(short)HIWORD(lp));
+		// scroll when mouse is outside (craftware)
+		{
+			short x = (short)LOWORD(lp);
+			short y = (short)HIWORD(lp);
+
+			RECT rc;
+			GetClientRect(hWnd, &rc);
+
+			if( y<0 ) {
+				PostMessage(gConWnd, WM_MOUSEWHEEL, WHEEL_DELTA<<16, y<<16|x );
+			}
+			else if(y>=rc.bottom) {
+				PostMessage(gConWnd, WM_MOUSEWHEEL, -WHEEL_DELTA<<16, y<<16|x );
+			}
+		}
 		break;
 	case WM_MBUTTONDOWN:
 	case WM_RBUTTONDOWN:

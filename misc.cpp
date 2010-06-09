@@ -146,9 +146,23 @@ void	sysmenu_init(HWND hWnd)
 	mii.cbSize = sizeof(mii);
 	mii.fMask = MIIM_TYPE | MIIM_ID;
 
+	#if 0 // preparing "Copy All" command (craftware)
+	mii.fType = MFT_STRING;
+	mii.wID = IDM_COPYALL;
+	mii.dwTypeData = L"&Copy All";
+	mii.cch = (UINT) wcslen(mii.dwTypeData);
+	InsertMenuItem(hMenu, SC_CLOSE, FALSE, &mii);
+
+	mii.fType = MFT_SEPARATOR;
+	mii.wID = 0;
+	mii.dwTypeData = 0;
+	mii.cch = 0;
+	InsertMenuItem(hMenu, SC_CLOSE, FALSE, &mii);
+	#endif
+
 	mii.fType = MFT_STRING;
 	mii.wID = IDM_ABOUT;
-	mii.dwTypeData = L"About (&A)";
+	mii.dwTypeData = L"&About";
 	mii.cch = (UINT) wcslen(mii.dwTypeData);
 	InsertMenuItem(hMenu, SC_CLOSE, FALSE, &mii);
 
@@ -163,6 +177,8 @@ void	sysmenu_init(HWND hWnd)
 BOOL	onSysCommand(HWND hWnd, DWORD id)
 {
 	switch(id) {
+	case IDM_COPYALL:
+		return(TRUE);
 	case IDM_ABOUT:
 		DialogBox(GetModuleHandle(NULL),
 			  MAKEINTRESOURCE(IDD_DIALOG1),

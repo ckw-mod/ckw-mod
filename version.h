@@ -3,6 +3,6 @@
 #define VERSION_BUGFIX 10
 #define VERSION_STRING "0.8.10-mod"
 #define VERSION_NUMSTRING "008101"
-#define BUILDDATE_STRING "2009/11/18 17:44:31 UTC+9"
+#define BUILDDATE_STRING "2010/04/26  0:33:50 UTC+9"
 #define COPYRIGHT_STRING "Copyright (C) 2005  Kazuo Ishii <k-ishii@wb4.so-net.ne.jp>"
-#define ABOUT_DLG_STRING "ckw version 0.8.10-mod , build 2009/11/18 17:44:31 UTC+9\r\nCopyright (C) 2005  Kazuo Ishii <k-ishii@wb4.so-net.ne.jp>"
+#define ABOUT_DLG_STRING "ckw version 0.8.10-mod , build 2010/04/26  0:33:50 UTC+9\r\nCopyright (C) 2005  Kazuo Ishii <k-ishii@wb4.so-net.ne.jp>"

@@ -5,3 +5,4 @@
 #define IDC_EDIT1	10002
 
 #define IDM_ABOUT	40001
+#define IDM_COPYALL	40002
