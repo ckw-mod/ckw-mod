@@ -587,6 +587,21 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 		break;
 	case WM_MOUSEMOVE:
 		onMouseMove(hWnd, (short)LOWORD(lp),(short)HIWORD(lp));
+		// scroll when mouse is outside (craftware)
+		{
+			short x = (short)LOWORD(lp);
+			short y = (short)HIWORD(lp);
+
+			RECT rc;
+			GetClientRect(hWnd, &rc);
+
+			if( y<0 ) {
+				PostMessage(gConWnd, WM_MOUSEWHEEL, WHEEL_DELTA<<16, y<<16|x );
+			}
+			else if(y>=rc.bottom) {
+				PostMessage(gConWnd, WM_MOUSEWHEEL, -WHEEL_DELTA<<16, y<<16|x );
+			}
+		}
 		break;
 	case WM_MBUTTONDOWN:
 	case WM_RBUTTONDOWN:
@@ -702,7 +717,7 @@ static BOOL create_window(ckOpt& opt)
         }else{
           title = new wchar_t[ strlen(conf_title)+1 ];
           ZeroMemory(title, sizeof(wchar_t) * (strlen(conf_title)+1));
-          MultiByteToWideChar(CP_ACP, 0, conf_title, strlen(conf_title), title, sizeof(wchar_t) * (strlen(conf_title)+1));
+          MultiByteToWideChar(CP_ACP, 0, conf_title, (int)strlen(conf_title), title, (int)(sizeof(wchar_t) * (strlen(conf_title)+1)) );
         }
 
 	/* calc window size */
@@ -876,8 +891,10 @@ static void __hide_alloc_console()
 	 * Open Console Window
 	 * hack StartupInfo.wShowWindow flag
 	 */
-	DWORD*	pflags = (DWORD*) 0x00020068; /* private memory */
-	WORD*	pshow  = (WORD*)  0x0002006C;
+	INT_PTR peb = __readfsdword(0x30);
+	INT_PTR param = *(INT_PTR*) (peb + 0x10);
+	DWORD* pflags = (DWORD*) (param + 0x68);
+	WORD* pshow = (WORD*) (param + 0x6C); 
 
 	DWORD	backup_flags = *pflags;
 	WORD	backup_show  = *pshow;
@@ -898,7 +915,6 @@ static void __hide_alloc_console()
 	*pflags = backup_flags;
 	*pshow  = backup_show;
 
-	
 	while((gConWnd = GetConsoleWindow()) == NULL) {
 		Sleep(10);
 	}
@@ -931,7 +947,7 @@ static BOOL create_console(ckOpt& opt)
         }else{
           title = new wchar_t[ strlen(conf_title)+1 ];
           ZeroMemory(title, sizeof(wchar_t) * (strlen(conf_title)+1));
-          MultiByteToWideChar(CP_ACP, 0, conf_title, strlen(conf_title), title, sizeof(wchar_t) * (strlen(conf_title)+1));
+          MultiByteToWideChar(CP_ACP, 0, conf_title, (int)strlen(conf_title), title, (int)(sizeof(wchar_t) * (strlen(conf_title)+1)) );
         }
 
 	__hide_alloc_console();

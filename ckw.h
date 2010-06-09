@@ -39,6 +39,9 @@ void	onLBtnUp(HWND hWnd, int x, int y);
 void	onMouseMove(HWND hWnd, int x, int y);
 
 /* misc.cpp */
+void	copyChar(wchar_t*& p, CHAR_INFO* src, SHORT start, SHORT end, bool ret = true);
+void	copyStringToClipboard(HWND hWnd, const wchar_t * str);
+void	copyAllStringToClipboard(HWND hWnd);
 void	onPasteFromClipboard(HWND hWnd);
 void	onDropFile(HDROP hDrop);
 void	sysmenu_init(HWND hWnd);

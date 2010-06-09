@@ -18,6 +18,9 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *---------------------------------------------------------------------------*/
+
+#include <string>
+
 #include "ckw.h"
 #include "rsrc.h"
 #include "option.h"
@@ -57,6 +60,30 @@ static void __write_console_input(LPCWSTR str, DWORD length)
 }
 
 /*----------*/
+void copyChar(wchar_t*& p, CHAR_INFO* src, SHORT start, SHORT end, bool ret)
+{
+	CHAR_INFO* pend = src + end;
+	CHAR_INFO* test = src + start;
+	CHAR_INFO* last = test-1;
+
+	/* search last char */
+	for( ; test <= pend ; test++) {
+		if(test->Char.UnicodeChar > 0x20)
+			last = test;
+	}
+	/* copy */
+	for(test = src+start ; test <= last ; test++) {
+		if(!(test->Attributes & COMMON_LVB_TRAILING_BYTE))
+			*p++ = test->Char.UnicodeChar;
+	}
+	if(ret && last < pend) {
+		*p++ = L'\r';
+		*p++ = L'\n';
+	}
+	*p = 0;
+}
+
+/*----------*/
 void	onPasteFromClipboard(HWND hWnd)
 {
 	bool	result = true;
@@ -80,6 +107,92 @@ void	onPasteFromClipboard(HWND hWnd)
 		GlobalUnlock(hMem);
 	}
 	CloseClipboard();
+}
+
+/*----------*/
+/* (craftware) */
+void copyStringToClipboard( HWND hWnd, const wchar_t * str )
+{
+	size_t length = wcslen(str) +1;
+	HANDLE hMem;
+	wchar_t* ptr;
+	bool	result = true;
+
+	hMem = GlobalAlloc(GMEM_MOVEABLE, sizeof(wchar_t) * length);
+	if(!hMem) result = false;
+
+	if(result && !(ptr = (wchar_t*) GlobalLock(hMem))) {
+		result = false;
+	}
+	if(result) {
+		memcpy(ptr, str, sizeof(wchar_t) * length);
+		GlobalUnlock(hMem);
+	}
+	if(result && !OpenClipboard(hWnd)) {
+		Sleep(10);
+		if(!OpenClipboard(hWnd))
+			result = false;
+	}
+	if(result) {
+		if(!EmptyClipboard() ||
+		   !SetClipboardData(CF_UNICODETEXT, hMem))
+			result = false;
+		CloseClipboard();
+	}
+	if(!result && hMem) {
+		GlobalFree(hMem);
+	}
+}
+
+/*----------*/
+/* (craftware) */
+wchar_t * getAllString()
+{
+	int nb;
+
+	nb = gCSI->dwSize.X * gCSI->dwSize.Y;
+
+	COORD      size = { gCSI->dwSize.X, 1 };
+	CHAR_INFO* work = new CHAR_INFO[ gCSI->dwSize.X ];
+	wchar_t*   buffer = new wchar_t[ nb ];
+	wchar_t*   wp = buffer;
+	COORD      pos = { 0,0 };
+	SMALL_RECT sr = { 0, 0, gCSI->dwSize.X-1, 0 };
+
+	*wp = 0;
+
+	for( int y=0 ; y<gCSI->dwSize.Y ; ++y )
+	{
+		sr.Top = sr.Bottom = y;
+		ReadConsoleOutput_Unicode(gStdOut, work, size, pos, &sr);
+		copyChar( wp, work, 0, gCSI->dwSize.X-1 );
+	}
+
+	delete [] work;
+
+	return(buffer);
+}
+
+/*----------*/
+/* (craftware) */
+void copyAllStringToClipboard(HWND hWnd)
+{
+	wchar_t* str = getAllString();
+	if(!str) return;
+	
+	std::wstring s = str;
+
+	// skip empty line
+	size_t begin = s.find_first_not_of(L"\r\n");
+	size_t end = s.find_last_not_of(L"\r\n");
+	if(begin!=s.npos && end!=s.npos)
+	{
+		s = s.substr( begin, end+1-begin );
+	}
+
+	copyStringToClipboard( hWnd, s.c_str() );
+
+	delete [] str;
 }
 
 /*----------*/
@@ -162,6 +275,12 @@ void	sysmenu_init(HWND hWnd)
 	memset(&mii, 0, sizeof(mii));
 	mii.cbSize = sizeof(mii);
 	mii.fMask = MIIM_TYPE | MIIM_ID;
+
+	mii.fType = MFT_STRING;
+	mii.wID = IDM_COPYALL;
+	mii.dwTypeData = L"Copy All(&C)";
+	mii.cch = (UINT) wcslen(mii.dwTypeData);
+	InsertMenuItem(hMenu, SC_CLOSE, FALSE, &mii);
 
 	mii.fType = MFT_STRING;
 	mii.wID = IDM_NEW;
@@ -329,6 +448,9 @@ void	changeStateTopMostMenu(HWND hWnd,HMENU hMenu)
 BOOL	onSysCommand(HWND hWnd, DWORD id)
 {
 	switch(id) {
+	case IDM_COPYALL:
+		copyAllStringToClipboard(hWnd);
+		return(TRUE);
 	case IDM_ABOUT:
 		DialogBox(GetModuleHandle(NULL),
 			  MAKEINTRESOURCE(IDD_DIALOG1),
