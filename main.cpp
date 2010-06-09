@@ -717,7 +717,7 @@ static BOOL create_window(ckOpt& opt)
         }else{
           title = new wchar_t[ strlen(conf_title)+1 ];
           ZeroMemory(title, sizeof(wchar_t) * (strlen(conf_title)+1));
-          MultiByteToWideChar(CP_ACP, 0, conf_title, strlen(conf_title), title, sizeof(wchar_t) * (strlen(conf_title)+1));
+          MultiByteToWideChar(CP_ACP, 0, conf_title, (int)strlen(conf_title), title, (int)(sizeof(wchar_t) * (strlen(conf_title)+1)) );
         }
 
 	/* calc window size */
@@ -928,7 +928,7 @@ static BOOL create_console(ckOpt& opt)
         }else{
           title = new wchar_t[ strlen(conf_title)+1 ];
           ZeroMemory(title, sizeof(wchar_t) * (strlen(conf_title)+1));
-          MultiByteToWideChar(CP_ACP, 0, conf_title, strlen(conf_title), title, sizeof(wchar_t) * (strlen(conf_title)+1));
+          MultiByteToWideChar(CP_ACP, 0, conf_title, (int)strlen(conf_title), title, (int)(sizeof(wchar_t) * (strlen(conf_title)+1)) );
         }
 
 	__hide_alloc_console();

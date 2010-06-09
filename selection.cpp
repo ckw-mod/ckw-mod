@@ -121,29 +121,6 @@ inline void __select_expand()
 	}
 }
 
-static void copy_char(wchar_t*& p, CHAR_INFO* src, SHORT start, SHORT end, bool ret = true)
-{
-	CHAR_INFO* pend = src + end;
-	CHAR_INFO* test = src + start;
-	CHAR_INFO* last = test-1;
-
-	/* search last char */
-	for( ; test <= pend ; test++) {
-		if(test->Char.UnicodeChar > 0x20)
-			last = test;
-	}
-	/* copy */
-	for(test = src+start ; test <= last ; test++) {
-		if(!(test->Attributes & COMMON_LVB_TRAILING_BYTE))
-			*p++ = test->Char.UnicodeChar;
-	}
-	if(ret && last < pend) {
-		*p++ = L'\r';
-		*p++ = L'\n';
-	}
-	*p = 0;
-}
-
 static void window_to_charpos(int& x, int& y)
 {
 	x -= gBorderSize;
@@ -160,15 +137,17 @@ static void window_to_charpos(int& x, int& y)
 
 /*****************************************************************************/
 
-#define SELECT_Invalid \
-	(gSelectRect.Top > gSelectRect.Bottom ||   \
-	 (gSelectRect.Top == gSelectRect.Bottom && \
-	  gSelectRect.Left >= gSelectRect.Right))  \
+static inline bool __select_invalid()
+{
+	return ( gSelectRect.Top > gSelectRect.Bottom ||
+	         (gSelectRect.Top == gSelectRect.Bottom &&
+	         gSelectRect.Left >= gSelectRect.Right) );
+}
 
 /*----------*/
 BOOL	selectionGetArea(SMALL_RECT& sr)
 {
-	if(SELECT_Invalid)
+	if( __select_invalid() )
 		return(FALSE);
 	sr = gSelectRect;
 	return(TRUE);
@@ -177,7 +156,7 @@ BOOL	selectionGetArea(SMALL_RECT& sr)
 /*----------*/
 void	selectionClear(HWND hWnd)
 {
-	if(SELECT_Invalid)
+	if( __select_invalid() )
 		return;
 	gSelectRect.Left = gSelectRect.Right = \
 	gSelectRect.Top = gSelectRect.Bottom = 0;
@@ -185,9 +164,9 @@ void	selectionClear(HWND hWnd)
 }
 
 /*----------*/
-wchar_t* selectionGetString()
+wchar_t * selectionGetString()
 {
-	if(SELECT_Invalid)
+	if( __select_invalid() )
 		return(NULL);
 
 	int nb, y;
@@ -214,20 +193,20 @@ wchar_t* selectionGetString()
 	if(gSelectRect.Top == gSelectRect.Bottom) {
 		sr.Top = sr.Bottom = gSelectRect.Top;
 		ReadConsoleOutput_Unicode(gStdOut, work, size, pos, &sr);
-		copy_char(wp, work, gSelectRect.Left, gSelectRect.Right-1, false);
+		copyChar(wp, work, gSelectRect.Left, gSelectRect.Right-1, false);
 	}
 	else {
 		sr.Top = sr.Bottom = gSelectRect.Top;
 		ReadConsoleOutput_Unicode(gStdOut, work, size, pos, &sr);
-		copy_char(wp, work, gSelectRect.Left, gCSI->srWindow.Right);
+		copyChar(wp, work, gSelectRect.Left, gCSI->srWindow.Right);
 		for(y = gSelectRect.Top+1 ; y <= gSelectRect.Bottom-1 ; y++) {
 			sr.Top = sr.Bottom = y;
 			ReadConsoleOutput_Unicode(gStdOut, work, size, pos, &sr);
-			copy_char(wp, work, gCSI->srWindow.Left, gCSI->srWindow.Right);
+			copyChar(wp, work, gCSI->srWindow.Left, gCSI->srWindow.Right);
 		}
 		sr.Top = sr.Bottom = gSelectRect.Bottom;
 		ReadConsoleOutput_Unicode(gStdOut, work, size, pos, &sr);
-		copy_char(wp, work, gCSI->srWindow.Left, gSelectRect.Right-1, false);
+		copyChar(wp, work, gCSI->srWindow.Left, gSelectRect.Right-1, false);
 	}
 
 	delete [] work;
@@ -296,35 +275,8 @@ void	onLBtnUp(HWND hWnd, int x, int y)
 	wchar_t* str = selectionGetString();
 	if(!str) return;
 
-	size_t length = wcslen(str) +1;
-	HANDLE hMem;
-	wchar_t* ptr;
-	bool	result = true;
+	copyStringToClipboard( hWnd, str );
 
-	hMem = GlobalAlloc(GMEM_MOVEABLE, sizeof(wchar_t) * length);
-	if(!hMem) result = false;
-
-	if(result && !(ptr = (wchar_t*) GlobalLock(hMem))) {
-		result = false;
-	}
-	if(result) {
-		memcpy(ptr, str, sizeof(wchar_t) * length);
-		GlobalUnlock(hMem);
-	}
-	if(result && !OpenClipboard(hWnd)) {
-		Sleep(10);
-		if(!OpenClipboard(hWnd))
-			result = false;
-	}
-	if(result) {
-		if(!EmptyClipboard() ||
-		   !SetClipboardData(CF_UNICODETEXT, hMem))
-			result = false;
-		CloseClipboard();
-	}
-	if(!result && hMem) {
-		GlobalFree(hMem);
-	}
 	delete [] str;
 }
 
