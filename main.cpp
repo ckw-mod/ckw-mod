@@ -890,8 +890,10 @@ static void __hide_alloc_console()
 	 * Open Console Window
 	 * hack StartupInfo.wShowWindow flag
 	 */
-	DWORD*	pflags = (DWORD*) 0x00020068; /* private memory */
-	WORD*	pshow  = (WORD*)  0x0002006C;
+	INT_PTR peb = __readfsdword(0x30);
+	INT_PTR param = *(INT_PTR*) (peb + 0x10);
+	DWORD* pflags = (DWORD*) (param + 0x68);
+	WORD* pshow = (WORD*) (param + 0x6C); 
 
 	DWORD	backup_flags = *pflags;
 	WORD	backup_show  = *pshow;
