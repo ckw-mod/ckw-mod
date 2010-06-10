@@ -882,6 +882,11 @@ static BOOL create_font(const char* name, int height)
 	return(TRUE);
 }
 
+// for Windows SDK v7.0 エラーが発生する場合はコメントアウト。
+#ifdef _MSC_VER
+#include <winternl.h>
+#endif
+
 /*----------*/
 static void __hide_alloc_console()
 {
@@ -891,10 +896,26 @@ static void __hide_alloc_console()
 	 * Open Console Window
 	 * hack StartupInfo.wShowWindow flag
 	 */
-	INT_PTR peb = __readfsdword(0x30);
+
+#ifdef _MSC_VER
+#ifndef _WINTERNL_
+	INT_PTR peb = *(INT_PTR*)((INT_PTR)NtCurrentTeb() + 0x30);
 	INT_PTR param = *(INT_PTR*) (peb + 0x10);
-	DWORD* pflags = (DWORD*) (param + 0x68);
-	WORD* pshow = (WORD*) (param + 0x6C); 
+#else
+	// for Windows SDK v7.0
+	PPEB peb = *(PPEB*)((INT_PTR)NtCurrentTeb() + 0x30);
+	PRTL_USER_PROCESS_PARAMETERS param = peb->ProcessParameters;
+#endif // _WINTERNL_
+
+	DWORD* pflags = (DWORD*)((INT_PTR)param + 0x68);
+	WORD* pshow = (WORD*)((INT_PTR)param + 0x6C);
+#else
+	// for gcc
+	INT_PTR peb = *(INT_PTR*)((INT_PTR)NtCurrentTeb() + 0x30);
+    PRTL_USER_PROCESS_PARAMETERS param = *(PRTL_USER_PROCESS_PARAMETERS*)(peb + 0x10);
+	DWORD* pflags = (DWORD*)&(param->dwFlags);
+	WORD* pshow = (WORD*)&(param->wShowWindow); 
+#endif // _MSC_VER
 
 	DWORD	backup_flags = *pflags;
 	WORD	backup_show  = *pshow;
