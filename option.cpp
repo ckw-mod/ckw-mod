@@ -20,7 +20,7 @@
  *---------------------------------------------------------------------------*/
 #include "option.h"
 #include "version.h"
-
+#include <shlwapi.h>
 
 static bool lookupColor(const char *str, COLORREF& ret)
 {
@@ -773,8 +773,8 @@ static bool lookupColor(const char *str, COLORREF& ret)
 		char	format[256];
 		int	span = (int)(strlen(str)-1) / 3;
 		int	r, g, b;
-		sprintf(format, "%%%dx%%%dx%%%dx", span, span, span);
-		if(sscanf(str+1, format, &r, &g, &b) == 3) {
+		sprintf_s(format, "%%%dx%%%dx%%%dx", span, span, span);
+		if(sscanf_s(str+1, format, &r, &g, &b) == 3) {
 			if(span < 2) {
 				r <<= 4;
 				g <<= 4;
@@ -1035,7 +1035,7 @@ int	ckOpt::setOption(const char *name, const char *value, bool rsrc)
 
 
 	unsigned int i;
-	if(sscanf(name, "color%u", &i)==1 && 0<=i && i<=15) {
+	if(sscanf_s(name, "color%u", &i)==1 && 0<=i && i<=15) {
 		if(!value) return(0);
 		lookupColor(value, m_colors[i]);
 		return(2);
@@ -1113,7 +1113,7 @@ void	ckOpt::_loadXdefaults(const char *path)
 	FILE	*fp;
 	std::string app, name, value;
 
-	fp = fopen(path, "r");
+	fopen_s(&fp, path, "r");
 	if(!fp) return;
 
 	do {
@@ -1138,36 +1138,65 @@ void	ckOpt::setFile(const char *path /*=NULL*/)
 {
     if(path)
     {
-        strcpy(m_config_file, path);
+        strcpy_s(m_config_file, path);
     } else
     {
         m_config_file[0] = '\0';
     }
 }
 
-void	ckOpt::loadXdefaults()
+static bool getconfigfile(const char* env, char *cfgfile, char *path, int size)
 {
-	char	path[MAX_PATH+1], *c;
-
-    if(m_config_file[0] == '\0')
-    {
-        GetModuleFileNameA(NULL, path, MAX_PATH);
-        c = strrchr(path, '.');
-        if(c) *c = 0;
-        strcat(path, ".cfg");
-    }
-    else
-    {
-		path[0] = '\0';
-        strcpy(path, m_config_file);
-    }
-
-	_loadXdefaults(path);
-
-	if(GetEnvironmentVariableA("HOME", path, MAX_PATH)) {
-		strcat(path, "\\.Xdefaults");
-		_loadXdefaults(path);
+	if(GetEnvironmentVariableA(env, path, size)) {
+		sprintf_s(path, size, "%s\\%s", path, cfgfile);
+		if(PathFileExistsA(path) && !PathIsDirectoryA(path)) {
+			return true;
+		}
 	}
+	return false;
+}
+
+void ckOpt::loadXdefaults()
+{
+  char path[MAX_PATH+1];
+
+  if(m_config_file[0] == '\0')
+  {
+    char cfgfile[MAX_PATH] = "_";
+
+    if (0 != GetModuleFileNameA(NULL, path, MAX_PATH)) {
+		char szDrive[MAX_PATH];
+		char szDir[MAX_PATH];
+		char szFile[MAX_PATH];
+		char szBuf[MAX_PATH];
+		_splitpath_s(path, szDrive, szDir, szFile, szBuf);
+		strcat_s(cfgfile, szFile);
+
+		path[0] = '\0';
+		// HOME or USERPROFILE
+		if (!getconfigfile("HOME", cfgfile, path, MAX_PATH)) {
+		  getconfigfile("USERPROFILE", cfgfile, path, MAX_PATH);
+		}
+		if (path[0] != '\0') _loadXdefaults(path);
+
+		// directory execute exists
+		_makepath_s(path, szDrive, szDir, cfgfile, NULL);
+		_loadXdefaults(path);
+		_makepath_s(path, szDrive, szDir, szFile, ".cfg");
+		_loadXdefaults(path);
+    }
+  }
+  else
+  {
+    path[0] = '\0';
+    strcpy_s(path, m_config_file);
+    _loadXdefaults(path);
+  }
+
+  if(GetEnvironmentVariableA("HOME", path, MAX_PATH)) {
+    strcat_s(path, "\\.Xdefaults");
+    _loadXdefaults(path);
+  }
 }
 
 bool	ckOpt::set(int argc, char *argv[])
