@@ -12,21 +12,18 @@
   http://www.geocities.jp/cygwin_ck/
 
   改変版はGithubにて公開しています。
-  http://github.com/deflis/ckw-mod
+  http://deflis.github.com/ckw-mod/
 
   このソフトウェアのライセンスは GNU General Public License v2です。
 
 ////////////////////////////////////////////
 // コンパイル
 
-  コンパイルするには
-   Microsoft Visual C++ Toolkit 2003
-   Microsoft Platform SDK
-  が必要です。
-  環境構築しておき、nmake でコンパイルできます。
+  ・Microsoft Visual C++ 2008
+  ・Microsoft Windows SDK v7.0
+  という組み合わせでコンパイルを確認しています。
 
-  もしくはVisual Studio 2008向けのソリューションファイルを同梱しています。
-　そちらでコンパイルすることも可能です。
+  Visual C++ 2008向けのソリューションファイルを同梱しています。
 
 ////////////////////////////////////////////
 // その他

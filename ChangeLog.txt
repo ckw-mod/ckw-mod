@@ -1,20 +1,46 @@
+2010-06-19  deflis
+    Version 0.9.0-mod-d1
+    * コンソール隠しに失敗する場合のパッチをMichiru氏やnocd5氏のパッチを参考に書き直し。
+      http://craftwave.blogspot.com/2010/05/ckwdos.html
+      http://nocd5.blog59.fc2.com/blog-entry-410.html
+    * craftware氏のmod4をマージ。
+    * nocd5氏のパッチを参考に%HOME%および%USERPROFILE%の_ckw、実行ファイルのあるディレクトリの_ckwを設定ファイルとして認識するように変更。
+      http://nocd5.blog59.fc2.com/blog-entry-410.html
+    * パッチ当てすぎてあまりにも変更点が多いのでマイナーバージョンを上げた。
+
+2010-05-17  craftware
+    Version 0.8.10-mod4-20100517
+    * AllocConsole 時に SW_HIDE を与えるために、__readfsdword を用いてアドレスを指定するようにしました。
+      http://craftwave.blogspot.com/2010/05/ckw-vistados.html
+
+2010-05-01  craftware
+    Version 0.8.10-mod4-20100501
+    * タイトルバーを右クリックしたときに出てくるメニューに、[Copy All]を追加しました。
+      コンソールの中のすべてのテキストをクリップボードに格納します。
+      http://craftwave.blogspot.com/2010/05/ckw-2-copyall.html
+
 2010-05-08  deflis
-    Version 0.8.10-mod+deflis-4
+    Version 0.8.10-mod+git-deflis-4
     * コンソール隠しに失敗する場合のパッチをnocd5氏のパッチ、および意見を参考に書き換え。
     * 常に最前面に表示をメニューで切り替えられるようにした。
 
+2010-04-26  craftware
+    Version 0.8.10-mod4-20100426
+    * マウスによるテキスト選択中に、マウスがウインドウの上下外側に行ったときに、自動的にスクロールするようにしました。
+      http://craftwave.blogspot.com/2010/04/ckw.html
+
 2010-03-21  deflis
-    Version 0.8.10-mod+deflis-3
+    Version 0.8.10-mod+git-deflis-3
     * XPパッチをmod3のものに切り替え。どっちがいいのかはわからない。
 
 2010-03-21  deflis
-    Version 0.8.10-mod+deflis-2
+    Version 0.8.10-mod+git-deflis-2
     * コンソール隠しに失敗する場合のパッチを適用するとXPで上手く動かないのを修正。
     * メニューバーで新しいウインドウを開けるようにした。
     * cfg切り替えを正規の方法で実装した。
 
 2010-03-19  deflis
-    Version 0.8.10-mod+deflis (shimizukawa's mod based)
+    Version 0.8.10-mod+git-deflis (shimizukawa's mod based)
     * コンソール隠しに失敗する場合のパッチをs-yata氏のものに切り替え。
       http://d.hatena.ne.jp/s-yata/20080823/1219474577
     * コマンドラインパラメータによるcfg切り替えの実装（中途半端）。
@@ -52,7 +78,7 @@
     * タイトルを指定するオプション-tl,--titleを追加
         * cmd用とnyacus用を見分けやすくしたくて。
     * フォントサイズを標準のDOS窓より小さく設定すると、最大化や窓リサイズで一定以上の大きさになるとウィンドウサイズがおかしくなってしまう不具合を修正(多分)
-        * MS Gothic 12で最大化するとなんかタイトルバーのみの小さな窓になってしまっていた。
+    * MS Gothic 12で最大化するとなんかタイトルバーのみの小さな窓になってしまっていた。
 
 2005-10-27  Kazuo Ishii  <k-ishii@wb4.so-net.ne.jp>
 	Version 0.8.10
