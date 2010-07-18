@@ -769,7 +769,7 @@ static BOOL create_window(ckOpt& opt)
 	wc.hbrBackground = CreateSolidBrush(gColorTable[0]);
 	wc.lpszMenuName = NULL;
 	wc.lpszClassName = className;
-	wc.hIconSm = wc.hIcon;
+	wc.hIconSm = NULL;
 	if(! RegisterClassEx(&wc))
 		return(FALSE);
 
