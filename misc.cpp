@@ -228,7 +228,7 @@ void	onDropFile(HDROP hDrop)
 }
 
 /*----------*/
-BOOL CALLBACK AboutDlgProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
+INT_PTR CALLBACK AboutDlgProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 {
 	switch(msg) {
 	case WM_INITDIALOG:

@@ -898,6 +898,12 @@ static void __hide_alloc_console()
 	 */
 
 #ifdef _MSC_VER
+#ifdef _WIN64
+	INT_PTR peb = *(INT_PTR*)((INT_PTR)NtCurrentTeb() + 0x60);
+	INT_PTR param = *(INT_PTR*) (peb + 0x20);
+	DWORD* pflags = (DWORD*) (param + 0xa4);
+	WORD* pshow = (WORD*) (param + 0xa8); 
+#else
 #ifndef _WINTERNL_
 	INT_PTR peb = *(INT_PTR*)((INT_PTR)NtCurrentTeb() + 0x30);
 	INT_PTR param = *(INT_PTR*) (peb + 0x10);
@@ -909,6 +915,7 @@ static void __hide_alloc_console()
 
 	DWORD* pflags = (DWORD*)((INT_PTR)param + 0x68);
 	WORD* pshow = (WORD*)((INT_PTR)param + 0x6C);
+#endif // _WIN64
 #else
 	// for gcc
 	INT_PTR peb = *(INT_PTR*)((INT_PTR)NtCurrentTeb() + 0x30);
@@ -925,6 +932,11 @@ static void __hide_alloc_console()
 
 	/* check */
 	if(si.dwFlags == backup_flags && si.wShowWindow == backup_show) {
+		// è⁄ç◊ÇÕïsñæÇæÇ™STARTF_TITLEISLINKNAMEÇ™óßÇ¡ÇƒÇ¢ÇÈÇ∆ÅA
+		// ConsoleëãâBÇµÇ…é∏îsÇ∑ÇÈÇÃÇ≈èúãé(Win7-64bit)
+		if (*pflags & STARTF_TITLEISLINKNAME) {
+			*pflags &= ~STARTF_TITLEISLINKNAME;
+		}
 		*pflags |= STARTF_USESHOWWINDOW;
 		*pshow  = SW_HIDE;
 		bResult = true;
@@ -964,12 +976,12 @@ static BOOL create_console(ckOpt& opt)
 
 	conf_title = opt.getTitle();
 	if(!conf_title || !conf_title[0]){
-          title = L"ckw";
-        }else{
-          title = new wchar_t[ strlen(conf_title)+1 ];
-          ZeroMemory(title, sizeof(wchar_t) * (strlen(conf_title)+1));
-          MultiByteToWideChar(CP_ACP, 0, conf_title, (int)strlen(conf_title), title, (int)(sizeof(wchar_t) * (strlen(conf_title)+1)) );
-        }
+		title = L"ckw";
+	}else{
+		title = new wchar_t[ strlen(conf_title)+1 ];
+		ZeroMemory(title, sizeof(wchar_t) * (strlen(conf_title)+1));
+		MultiByteToWideChar(CP_ACP, 0, conf_title, (int)strlen(conf_title), title, (int)(sizeof(wchar_t) * (strlen(conf_title)+1)) );
+	}
 
 	__hide_alloc_console();
 
@@ -1163,6 +1175,7 @@ static void _terminate()
 	SAFE_DeleteObject(gFont);
 	SAFE_DeleteObject(gBgBrush);
 	SAFE_DeleteObject(gBgBmp);
+	ime_wrap_term();
 }
 
 #ifdef _DEBUG

@@ -94,8 +94,17 @@ BOOL	ime_wrap_init()
 		fn_SetCompositionFontW = NULL;
 		fn_SetCompositionWindow = NULL;
 		FreeLibrary(gDll);
+		gDll = NULL;
 	}
 	return(result);
+}
+
+void ime_wrap_term()
+{
+	if (gDll) {
+		FreeLibrary(gDll);
+		gDll = NULL;
+	}
 }
 
 /* EOF */

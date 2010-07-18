@@ -2,6 +2,7 @@
 #define __IME_WRAP_H__ 1
 
 BOOL	ime_wrap_init();
+void	ime_wrap_term();
 
 HIMC WINAPI ImmGetContext(HWND hwnd);
 BOOL WINAPI ImmReleaseContext(HWND hwnd, HIMC imc);
