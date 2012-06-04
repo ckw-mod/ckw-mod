@@ -559,7 +559,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 		KillTimer(hWnd, 0x3571);
 		PostQuitMessage(0);
 		if(WaitForSingleObject(gChild, 0) == WAIT_TIMEOUT)
-			TerminateProcess(gChild, 0);
+			PostMessage(gConWnd, WM_CLOSE, 0, 0);
 		break;
 	case WM_TIMER:
 		onTimer(hWnd);
