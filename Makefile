@@ -6,7 +6,7 @@ CFLAGS = -nologo -MT -O2 -W3 -EHsc -DNDEBUG
 LDFLAGS = -nologo
 
 UINC = 
-ULIB = user32.lib gdi32.lib shell32.lib
+ULIB = user32.lib gdi32.lib shell32.lib shlwapi.lib
 
 .SUFFIXES: .exe .obj .cpp .rc .res
 
