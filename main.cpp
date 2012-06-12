@@ -684,12 +684,14 @@ static BOOL create_window(ckOpt& opt)
 	HINSTANCE hInstance = GetModuleHandle(NULL);
 	LPWSTR	className = L"CkwWindowClass";
 	const char*	conf_title;
+	const char*	conf_icon;
 	LPWSTR	title;
 	WNDCLASSEX wc;
 	DWORD	style = WS_OVERLAPPEDWINDOW;
 	DWORD	exstyle = WS_EX_ACCEPTFILES;
 	LONG	width, height;
 	LONG	posx, posy;
+	HICON	icon;
 
 	if(opt.isTranspColor() ||
 	   (0 < opt.getTransp() && opt.getTransp() < 255))
@@ -719,6 +721,17 @@ static BOOL create_window(ckOpt& opt)
           ZeroMemory(title, sizeof(wchar_t) * (strlen(conf_title)+1));
           MultiByteToWideChar(CP_ACP, 0, conf_title, (int)strlen(conf_title), title, (int)(sizeof(wchar_t) * (strlen(conf_title)+1)) );
         }
+
+	conf_icon = opt.getIcon();
+	if(!conf_icon || !conf_icon[0]){
+		icon = LoadIcon(hInstance, (LPCTSTR)IDR_ICON);
+	}else{
+		LPWSTR icon_path = new wchar_t[ strlen(conf_icon)+1 ];
+		ZeroMemory(icon_path, sizeof(wchar_t) * (strlen(conf_icon)+1));
+		MultiByteToWideChar(CP_ACP, 0, conf_icon, (int)strlen(conf_icon), icon_path, (int)(sizeof(wchar_t) * (strlen(conf_icon)+1)) );
+		icon = (HICON)LoadImage(NULL, icon_path, IMAGE_ICON, 0, 0, LR_LOADFROMFILE);
+		delete [] icon_path;
+	}
 
 	/* calc window size */
 	CONSOLE_SCREEN_BUFFER_INFO csi;
@@ -764,7 +777,7 @@ static BOOL create_window(ckOpt& opt)
 	wc.cbClsExtra = 0;
 	wc.cbWndExtra = 0;
 	wc.hInstance = hInstance;
-	wc.hIcon = LoadIcon(hInstance, (LPCTSTR)IDR_ICON);
+	wc.hIcon = icon;
 	wc.hCursor = LoadCursor(NULL, IDC_ARROW);
 	wc.hbrBackground = CreateSolidBrush(gColorTable[0]);
 	wc.lpszMenuName = NULL;

@@ -60,6 +60,10 @@ public:
 	{
 		return((m_title.size()) ? m_title.c_str() : NULL);
 	}
+	const char*	getIcon()
+	{
+		return((m_icon.size()) ? m_icon.c_str() : NULL);
+	}
 
 
 protected:
@@ -84,6 +88,7 @@ private:
 	COLORREF	m_colorCursorIme;
 	COLORREF	m_colors[17];
 	std::string	m_bgBmp;
+	std::string	m_icon;
 	bool		m_scrollHide;
 	bool		m_scrollRight;
 	int		m_saveLines;
