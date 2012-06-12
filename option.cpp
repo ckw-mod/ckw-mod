@@ -1016,6 +1016,7 @@ int	ckOpt::setOption(const char *name, const char *value, bool rsrc)
 	CHK_MISC("cursorColor",		"cr",		lookupColor(value, m_colorCursor));
 	CHK_MISC("cursorImeColor",	"cri",		lookupColor(value, m_colorCursorIme));
 	CHK_MISC("backgroundBitmap",	"bitmap",	m_bgBmp = value);
+	CHK_MISC("icon",		"ico",		m_icon = value);
 	CHK_MISC("geometry",		"g",		geometry(value));
 	CHK_BOOL(NULL, 			"iconic",	m_isIconic);
 	CHK_MISC("font",		"fn",		m_font = value);
@@ -1067,6 +1068,7 @@ static void usage(bool isLong)
 	"color14",		NULL,		"color",	"",
 	"color15",		NULL,		"color",	"",
 	"backgroundBitmap",	"bitmap",	"string",	"background bmp file",
+	"icon",			"ico",		"string",	"icon file",
 	"geometry",		"g",		"string",	"window layout. ( ex. 80x24+0+0 )",
 	NULL, 			"iconic",	"boolean",	"start iconic",
 	"font",			"fn",		"string",	"text font name",
