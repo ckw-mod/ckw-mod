@@ -692,6 +692,7 @@ static BOOL create_window(ckOpt& opt)
 	LONG	width, height;
 	LONG	posx, posy;
 	HICON	icon;
+	HICON	iconsm;
 
 	if(opt.isTranspColor() ||
 	   (0 < opt.getTransp() && opt.getTransp() < 255))
@@ -729,7 +730,8 @@ static BOOL create_window(ckOpt& opt)
 		LPWSTR icon_path = new wchar_t[ strlen(conf_icon)+1 ];
 		ZeroMemory(icon_path, sizeof(wchar_t) * (strlen(conf_icon)+1));
 		MultiByteToWideChar(CP_ACP, 0, conf_icon, (int)strlen(conf_icon), icon_path, (int)(sizeof(wchar_t) * (strlen(conf_icon)+1)) );
-		icon = (HICON)LoadImage(NULL, icon_path, IMAGE_ICON, 0, 0, LR_LOADFROMFILE);
+		icon   = (HICON)LoadImage(NULL, icon_path, IMAGE_ICON, GetSystemMetrics(SM_CXICON),   GetSystemMetrics(SM_CYICON),   LR_LOADFROMFILE);
+		iconsm = (HICON)LoadImage(NULL, icon_path, IMAGE_ICON, GetSystemMetrics(SM_CXSMICON), GetSystemMetrics(SM_CYSMICON), LR_LOADFROMFILE);
 		delete [] icon_path;
 	}
 
@@ -782,7 +784,7 @@ static BOOL create_window(ckOpt& opt)
 	wc.hbrBackground = CreateSolidBrush(gColorTable[0]);
 	wc.lpszMenuName = NULL;
 	wc.lpszClassName = className;
-	wc.hIconSm = NULL;
+	wc.hIconSm = iconsm;
 	if(! RegisterClassEx(&wc))
 		return(FALSE);
 
