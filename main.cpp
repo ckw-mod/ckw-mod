@@ -725,7 +725,8 @@ static BOOL create_window(ckOpt& opt)
 
 	conf_icon = opt.getIcon();
 	if(!conf_icon || !conf_icon[0]){
-		icon = LoadIcon(hInstance, (LPCTSTR)IDR_ICON);
+		icon   = (HICON)LoadImage(hInstance, MAKEINTRESOURCE(IDR_ICON), IMAGE_ICON, GetSystemMetrics(SM_CXICON),   GetSystemMetrics(SM_CYICON),   LR_DEFAULTCOLOR);
+		iconsm = (HICON)LoadImage(hInstance, MAKEINTRESOURCE(IDR_ICON), IMAGE_ICON, GetSystemMetrics(SM_CXSMICON), GetSystemMetrics(SM_CYSMICON), LR_DEFAULTCOLOR);
 	}else{
 		LPWSTR icon_path = new wchar_t[ strlen(conf_icon)+1 ];
 		ZeroMemory(icon_path, sizeof(wchar_t) * (strlen(conf_icon)+1));
