@@ -86,7 +86,7 @@ private:
 	COLORREF	m_colorBg;
 	COLORREF	m_colorCursor;
 	COLORREF	m_colorCursorIme;
-	COLORREF	m_colors[17];
+	COLORREF	m_colors[16];
 	std::string	m_bgBmp;
 	std::string	m_icon;
 	bool		m_scrollHide;
