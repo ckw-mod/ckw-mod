@@ -1227,9 +1227,6 @@ int APIENTRY wWinMain(HINSTANCE hInst, HINSTANCE hPrev, LPWSTR lpCmdLine, int nC
 /* 新規ウインドウの作成 */
 void makeNewWindow()
 {
-	LPWSTR cd = new TCHAR[MAX_PATH+1];
-	GetCurrentDirectory(MAX_PATH, cd);
-
 	STARTUPINFO si;
 	ZeroMemory(&si, sizeof(si));
 	si.cb = sizeof(si);
