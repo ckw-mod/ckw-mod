@@ -913,32 +913,31 @@ static void __hide_alloc_console()
 	 * hack StartupInfo.wShowWindow flag
 	 */
 
-#ifdef _MSC_VER
-#ifdef _WIN64
+#if defined(_MSC_VER) && defined(_WIN64)
+	// for Win64
 	INT_PTR peb = *(INT_PTR*)((INT_PTR)NtCurrentTeb() + 0x60);
 	INT_PTR param = *(INT_PTR*) (peb + 0x20);
 	DWORD* pflags = (DWORD*) (param + 0xa4);
 	WORD* pshow = (WORD*) (param + 0xa8); 
-#else
-#ifndef _WINTERNL_
-	INT_PTR peb = *(INT_PTR*)((INT_PTR)NtCurrentTeb() + 0x30);
-	INT_PTR param = *(INT_PTR*) (peb + 0x10);
-#else
+#elif defined(_MSC_VER) && defined(_WINTERNL_)
 	// for Windows SDK v7.0
 	PPEB peb = *(PPEB*)((INT_PTR)NtCurrentTeb() + 0x30);
 	PRTL_USER_PROCESS_PARAMETERS param = peb->ProcessParameters;
-#endif // _WINTERNL_
-
 	DWORD* pflags = (DWORD*)((INT_PTR)param + 0x68);
 	WORD* pshow = (WORD*)((INT_PTR)param + 0x6C);
-#endif // _WIN64
+#elif defined(_MSC_VER)
+	// not include winternl.h
+	INT_PTR peb = *(INT_PTR*)((INT_PTR)NtCurrentTeb() + 0x30);
+	INT_PTR param = *(INT_PTR*) (peb + 0x10);
+	DWORD* pflags = (DWORD*)((INT_PTR)param + 0x68);
+	WORD* pshow = (WORD*)((INT_PTR)param + 0x6C);
 #else
 	// for gcc
 	INT_PTR peb = *(INT_PTR*)((INT_PTR)NtCurrentTeb() + 0x30);
-    PRTL_USER_PROCESS_PARAMETERS param = *(PRTL_USER_PROCESS_PARAMETERS*)(peb + 0x10);
+	PRTL_USER_PROCESS_PARAMETERS param = *(PRTL_USER_PROCESS_PARAMETERS*)(peb + 0x10);
 	DWORD* pflags = (DWORD*)&(param->dwFlags);
 	WORD* pshow = (WORD*)&(param->wShowWindow); 
-#endif // _MSC_VER
+#endif
 
 	DWORD	backup_flags = *pflags;
 	WORD	backup_show  = *pshow;
