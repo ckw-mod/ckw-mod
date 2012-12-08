@@ -683,9 +683,7 @@ static BOOL create_window(ckOpt& opt)
 
 	HINSTANCE hInstance = GetModuleHandle(NULL);
 	LPWSTR	className = L"CkwWindowClass";
-	const char*	conf_title;
 	const char*	conf_icon;
-	LPWSTR	title;
 	WNDCLASSEX wc;
 	DWORD	style = WS_OVERLAPPEDWINDOW;
 	DWORD	exstyle = WS_EX_ACCEPTFILES;
@@ -713,15 +711,6 @@ static BOOL create_window(ckOpt& opt)
 
 	if(opt.isIconic())
 		style |= WS_MINIMIZE;
-
-	conf_title = opt.getTitle();
-	if(!conf_title || !conf_title[0]){
-          title = L"ckw";
-        }else{
-          title = new wchar_t[ strlen(conf_title)+1 ];
-          ZeroMemory(title, sizeof(wchar_t) * (strlen(conf_title)+1));
-          MultiByteToWideChar(CP_ACP, 0, conf_title, (int)strlen(conf_title), title, (int)(sizeof(wchar_t) * (strlen(conf_title)+1)) );
-        }
 
 	conf_icon = opt.getIcon();
 	if(!conf_icon || !conf_icon[0]){
@@ -789,11 +778,10 @@ static BOOL create_window(ckOpt& opt)
 	if(! RegisterClassEx(&wc))
 		return(FALSE);
 
-	HWND hWnd = CreateWindowEx(exstyle, className, title, style,
+	HWND hWnd = CreateWindowEx(exstyle, className, gTitle, style,
 				   posx, posy, width, height,
 				   NULL, NULL, hInstance, NULL);
 	if(!hWnd){
-		delete [] title;
 		return(FALSE);
         }
 
@@ -986,21 +974,10 @@ BOOL WINAPI sig_handler(DWORD n)
 
 static BOOL create_console(ckOpt& opt)
 {
-	const char*	conf_title;
-	LPWSTR	title;
-
-	conf_title = opt.getTitle();
-	if(!conf_title || !conf_title[0]){
-		title = L"ckw";
-	}else{
-		title = new wchar_t[ strlen(conf_title)+1 ];
-		ZeroMemory(title, sizeof(wchar_t) * (strlen(conf_title)+1));
-		MultiByteToWideChar(CP_ACP, 0, conf_title, (int)strlen(conf_title), title, (int)(sizeof(wchar_t) * (strlen(conf_title)+1)) );
-	}
-
 	__hide_alloc_console();
 
-	SetConsoleTitle(title);
+	if(gTitle)
+		SetConsoleTitle(gTitle);
 
 	SetConsoleCtrlHandler(sig_handler, TRUE);
 
@@ -1120,6 +1097,17 @@ BOOL init_options(ckOpt& opt)
 	}
 	if(gBgBmp)    gBgBrush = CreatePatternBrush(gBgBmp);
 	if(!gBgBrush) gBgBrush = CreateSolidBrush(gColorTable[0]);
+
+	if(gTitle) delete [] gTitle;
+	const char *conf_title = opt.getTitle();
+	if(!conf_title || !conf_title[0]){
+		gTitle = new wchar_t[ wcslen(L"ckw")+1 ];
+		wcscpy(gTitle, L"ckw");
+	}else{
+		gTitle = new wchar_t[ strlen(conf_title)+1 ];
+		ZeroMemory(gTitle, sizeof(wchar_t) * (strlen(conf_title)+1));
+		MultiByteToWideChar(CP_ACP, 0, conf_title, (int)strlen(conf_title), gTitle, (int)(sizeof(wchar_t) * (strlen(conf_title)+1)) );
+	}
 
 	return(TRUE);
 }
