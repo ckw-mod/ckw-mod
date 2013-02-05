@@ -465,6 +465,7 @@ void	onTimer(HWND hWnd)
 			delete [] gTitle;
 			gTitle = str;
 			SetWindowText(hWnd, gTitle);
+			updateTrayTip(hWnd, gTitle);
 		}
 	}
 
@@ -556,6 +557,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 		SetTimer(hWnd, 0x3571, 10, NULL);
 		break;
 	case WM_DESTROY:
+		sysicon_destroy(hWnd);
+
 		KillTimer(hWnd, 0x3571);
 		PostQuitMessage(0);
 		if(WaitForSingleObject(gChild, 0) == WAIT_TIMEOUT)
@@ -665,6 +668,18 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 		}
 		else {
 			PostMessage(gConWnd, msg, wp, lp);
+		}
+		break;
+	case WM_TRAYICON:
+		switch(lp) {
+		case WM_LBUTTONUP:
+			trayToDesktop(hWnd);
+			break;
+		case WM_RBUTTONUP:
+			POINT curpos;
+			GetCursorPos(&curpos);
+			SendMessage(hWnd, 0x313, 0, curpos.x | (curpos.y << 16));
+			break;
 		}
 		break;
 	default:
@@ -786,6 +801,7 @@ static BOOL create_window(ckOpt& opt)
         }
 
 	sysmenu_init(hWnd);
+	sysicon_init(hWnd, iconsm, gTitle);
 
 	if(0 < opt.getTransp() && opt.getTransp() < 255)
 		SetLayeredWindowAttributes(hWnd, 0, opt.getTransp(), LWA_ALPHA);
