@@ -558,6 +558,7 @@ void	trayToDesktop(HWND hWnd)
 
 	if(!sysicon_alwaysTray) Shell_NotifyIcon(NIM_MODIFY, &notif);
 	SetWindowPos(hWnd, NULL, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_SHOWWINDOW);
+	if(IsIconic(hWnd)) ShowWindow(hWnd, SW_RESTORE);
 }
 
 /* EOF */

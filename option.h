@@ -30,6 +30,7 @@ public:
 	}
 
 	bool		isAlwaysTray()		{ return(m_alwaysTray); }
+	bool		isMinimizeToTray()	{ return(m_minimizeToTray); }
 	bool		isScrollHide()		{ return(m_scrollHide); }
 	bool		isScrollRight()		{ return(m_scrollRight); }
 	int		getSaveLines()		{ return(m_saveLines); }
@@ -91,6 +92,7 @@ private:
 	std::string	m_bgBmp;
 	std::string	m_icon;
 	bool		m_alwaysTray;
+	bool		m_minimizeToTray;
 	bool		m_scrollHide;
 	bool		m_scrollRight;
 	int		m_saveLines;
