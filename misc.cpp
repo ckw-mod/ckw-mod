@@ -484,14 +484,18 @@ BOOL	onSysCommand(HWND hWnd, DWORD id)
 
 /*----------*/
 
-void	sysicon_init(HWND hWnd, HICON icon, const wchar_t* title)
+bool	sysicon_alwaysTray = false;
+
+void	sysicon_init(HWND hWnd, HICON icon, const wchar_t* title, bool alwaysTray)
 {
+	sysicon_alwaysTray = alwaysTray;
+
 	NOTIFYICONDATA notif;
 	notif.cbSize = sizeof(notif);
 	notif.hWnd = hWnd;
 	notif.uID = IDM_TRAYICON;
 	notif.uFlags = NIF_STATE | NIF_ICON | NIF_MESSAGE | NIF_TIP;
-	notif.dwState = NIS_HIDDEN;
+	notif.dwState = sysicon_alwaysTray ? 0 : NIS_HIDDEN;
 	notif.dwStateMask = NIS_HIDDEN;
 	notif.hIcon = icon;
 	notif.uCallbackMessage = WM_TRAYICON;
@@ -538,7 +542,7 @@ void	desktopToTray(HWND hWnd)
 	notif.dwState = 0;
 	notif.dwStateMask = NIS_HIDDEN;
 
-	Shell_NotifyIcon(NIM_MODIFY, &notif);
+	if(!sysicon_alwaysTray) Shell_NotifyIcon(NIM_MODIFY, &notif);
 	SetWindowPos(hWnd, NULL, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_HIDEWINDOW);
 }
 
@@ -552,7 +556,7 @@ void	trayToDesktop(HWND hWnd)
 	notif.dwState = NIS_HIDDEN;
 	notif.dwStateMask = NIS_HIDDEN;
 
-	Shell_NotifyIcon(NIM_MODIFY, &notif);
+	if(!sysicon_alwaysTray) Shell_NotifyIcon(NIM_MODIFY, &notif);
 	SetWindowPos(hWnd, NULL, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_SHOWWINDOW);
 }
 

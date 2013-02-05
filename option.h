@@ -29,6 +29,7 @@ public:
 		return((0 <= i && i <= 15) ? m_colors[i] : m_colors[0]);
 	}
 
+	bool		isAlwaysTray()		{ return(m_alwaysTray); }
 	bool		isScrollHide()		{ return(m_scrollHide); }
 	bool		isScrollRight()		{ return(m_scrollRight); }
 	int		getSaveLines()		{ return(m_saveLines); }
@@ -89,6 +90,7 @@ private:
 	COLORREF	m_colors[16];
 	std::string	m_bgBmp;
 	std::string	m_icon;
+	bool		m_alwaysTray;
 	bool		m_scrollHide;
 	bool		m_scrollRight;
 	int		m_saveLines;

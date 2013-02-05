@@ -47,7 +47,7 @@ void	onPasteFromClipboard(HWND hWnd);
 void	onDropFile(HDROP hDrop);
 void	sysmenu_init(HWND hWnd);
 BOOL	onSysCommand(HWND hWnd, DWORD id);
-void	sysicon_init(HWND hWnd, HICON icon, const wchar_t* title);
+void	sysicon_init(HWND hWnd, HICON icon, const wchar_t* title, bool alwaysTray);
 void	sysicon_destroy(HWND hWnd);
 void	updateTrayTip(HWND hWnd, const wchar_t* title);
 void	desktopToTray(HWND hWnd);

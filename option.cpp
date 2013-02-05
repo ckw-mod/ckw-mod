@@ -961,6 +961,7 @@ ckOpt::ckOpt()
 	m_colorBg    = RGB(0x00, 0x00, 0x01); // cursor bg
 	m_colorCursor = RGB(0xC0, 0xC0, 0x80);
 	m_colorCursorIme = RGB(0xC0, 0x00, 0x00);
+	m_alwaysTray = false;
 	m_scrollHide = false;
 	m_scrollRight = true;
 	m_saveLines = 500;
@@ -1017,6 +1018,7 @@ int	ckOpt::setOption(const char *name, const char *value, bool rsrc)
 	CHK_MISC("cursorImeColor",	"cri",		lookupColor(value, m_colorCursorIme));
 	CHK_MISC("backgroundBitmap",	"bitmap",	m_bgBmp = value);
 	CHK_MISC("icon",		NULL,		m_icon = value);
+	CHK_BOOL("alwaysTray",		"tray",		m_alwaysTray);
 	CHK_MISC("geometry",		"g",		geometry(value));
 	CHK_BOOL(NULL, 			"iconic",	m_isIconic);
 	CHK_MISC("font",		"fn",		m_font = value);
@@ -1069,6 +1071,7 @@ static void usage(bool isLong)
 	"color15",		NULL,		"color",	"",
 	"backgroundBitmap",	"bitmap",	"string",	"background bmp file",
 	"icon",			NULL,		"string",	"icon file",
+	"alwaysTray", 		"tray",		"boolean",	"always show tray icon",
 	"geometry",		"g",		"string",	"window layout. ( ex. 80x24+0+0 )",
 	NULL, 			"iconic",	"boolean",	"start iconic",
 	"font",			"fn",		"string",	"text font name",

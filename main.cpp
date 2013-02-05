@@ -673,7 +673,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 	case WM_TRAYICON:
 		switch(lp) {
 		case WM_LBUTTONUP:
-			trayToDesktop(hWnd);
+			if(IsWindowVisible(hWnd)) {
+				desktopToTray(hWnd);
+			}else{
+				trayToDesktop(hWnd);
+			}
 			break;
 		case WM_RBUTTONUP:
 			POINT curpos;
@@ -801,7 +805,7 @@ static BOOL create_window(ckOpt& opt)
         }
 
 	sysmenu_init(hWnd);
-	sysicon_init(hWnd, iconsm, gTitle);
+	sysicon_init(hWnd, iconsm, gTitle, opt.isAlwaysTray());
 
 	if(0 < opt.getTransp() && opt.getTransp() < 255)
 		SetLayeredWindowAttributes(hWnd, 0, opt.getTransp(), LWA_ALPHA);
