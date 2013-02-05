@@ -264,7 +264,7 @@ L" 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA."
 
 /*----------*/
 void	sysmenu_init_topmost(HWND hWnd, HMENU hMenu);
-void	sysmenu_init_subconfig(HWND hWnd, HMENU hMenu);
+//void	sysmenu_init_subconfig(HWND hWnd, HMENU hMenu);
 void	changeStateTopMostMenu(HWND hWnd, HMENU hMenu);
 
 void	sysmenu_init(HWND hWnd)
@@ -337,6 +337,7 @@ void	sysmenu_init_topmost(HWND hWnd, HMENU hMenu)
 	changeStateTopMostMenu(hWnd,hMenu);
 }
 
+/*
 void	sysmenu_init_subconfig(HWND hWnd, HMENU hMenu)
 {
 	MENUITEMINFO mii;
@@ -377,6 +378,7 @@ void	sysmenu_init_subconfig(HWND hWnd, HMENU hMenu)
 	mii.cch = (UINT) wcslen(mii.dwTypeData);
 	InsertMenuItem(hMenu, SC_CLOSE, FALSE, &mii);
 }
+*/
 
 void reloadConfig(wchar_t *path)
 {

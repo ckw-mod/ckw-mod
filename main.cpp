@@ -1186,7 +1186,7 @@ static void _terminate()
 #endif
 
 /*----------*/
-int APIENTRY wWinMain(HINSTANCE hInst, HINSTANCE hPrev, LPWSTR lpCmdLine, int nCmdShow)
+int APIENTRY WinMain(HINSTANCE hInst, HINSTANCE hPrev, LPSTR lpCmdLine, int nCmdShow)
 {
 #ifdef _DEBUG
 	char *a = new char[1];
