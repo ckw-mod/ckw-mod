@@ -422,12 +422,12 @@ BOOL	onTopMostMenuCommand(HWND hWnd)
 	HMENU hMenu = GetSystemMenu(hWnd, FALSE);
 
 	UINT uState = GetMenuState( hMenu, IDM_TOPMOST, MF_BYCOMMAND);
-	DWORD dwExStyle = GetWindowLong(hWnd,GWL_EXSTYLE);
+	//DWORD dwExStyle = GetWindowLong(hWnd,GWL_EXSTYLE); // unused variable
 	if( uState & MFS_CHECKED )
 	{
-		SetWindowPos(hWnd, HWND_NOTOPMOST,NULL,NULL,NULL,NULL,SWP_NOMOVE | SWP_NOSIZE); 
+		SetWindowPos(hWnd, HWND_NOTOPMOST,0,0,0,0,SWP_NOMOVE | SWP_NOSIZE); 
 	}else{
-		SetWindowPos(hWnd, HWND_TOPMOST,NULL,NULL,NULL,NULL,SWP_NOMOVE | SWP_NOSIZE); 
+		SetWindowPos(hWnd, HWND_TOPMOST,0,0,0,0,SWP_NOMOVE | SWP_NOSIZE); 
 	}
 
 	changeStateTopMostMenu(hWnd, hMenu);

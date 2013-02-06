@@ -26,6 +26,7 @@ CC      = gcc.exe
 CP      = g++.exe
 WINDRES = windres.exe -J rc -O coff --include-dir $(<D)
 CFLAGS  = -Os -Wall -Wextra \
+          -Wno-unused-parameter \
           -fno-rtti \
           -fno-exceptions \
           -fomit-frame-pointer \
