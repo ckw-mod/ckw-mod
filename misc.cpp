@@ -18,7 +18,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *---------------------------------------------------------------------------*/
-
+#define _CRT_SECURE_NO_WARNINGS 1
 #include <string>
 
 #include "ckw.h"
@@ -383,6 +383,7 @@ void	sysmenu_init_subconfig(HWND hWnd, HMENU hMenu)
 void reloadConfig(wchar_t *path)
 {
 	char filepath[MAX_PATH+1];
+	if(wcstombs(NULL, path, 0) + 1 > sizeof(filepath) / sizeof(filepath[0])) return;
 	wcstombs(filepath, path, MAX_PATH);
 
 	ckOpt opt;
