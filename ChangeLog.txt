@@ -1,3 +1,23 @@
+2013-03-10  NANRI
+    Version 0.9.1
+    * カーソルを点滅させるオプションを追加 (by DeaR)
+        * --cursorBlink <true|false>
+        * -/+crb
+    * 背景画像の表示位置を指定可能にした (by DeaR)
+        * --backgroundBitmapPos <N>
+        * -bitmappos <N>
+    * システムトレイに収納する機能を追加 (by wantora)
+        * --alwaysTray <true|false>
+        * -/+tray
+        * --minimizeToTray <true|false>
+        * -/+mintray
+    * タイトルバーアイコンを指定するオプションを追加 (by southly, nocd5)
+        * --icon <filename>
+    * 「--chdir」オプションに存在しないディレクトリを指定したときに
+      即終了していたが、起動だけはするように修正
+    * 子プロセスの終了を修正 (by nocd5)
+    * その他細かい修正
+
 2010-07-15  deflis
     Version 0.9.0-mod-d2
     * rururu氏のx64パッチを適用（ただしうちの環境ではコンパイルできないのでx64でリリースできない）
