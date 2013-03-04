@@ -484,79 +484,95 @@ BOOL	onSysCommand(HWND hWnd, DWORD id)
 
 /*----------*/
 
+void	sysicon_addicon();
+
+bool	sysicon_initialized = false;
 bool	sysicon_alwaysTray = false;
+NOTIFYICONDATA	sysicon_notif;
 
 void	sysicon_init(HWND hWnd, HICON icon, const wchar_t* title, bool alwaysTray)
 {
+	sysicon_initialized = false;
 	sysicon_alwaysTray = alwaysTray;
 
-	NOTIFYICONDATA notif;
-	notif.cbSize = sizeof(notif);
-	notif.hWnd = hWnd;
-	notif.uID = IDM_TRAYICON;
-	notif.uFlags = NIF_STATE | NIF_ICON | NIF_MESSAGE | NIF_TIP;
-	notif.dwState = sysicon_alwaysTray ? 0 : NIS_HIDDEN;
-	notif.dwStateMask = NIS_HIDDEN;
-	notif.hIcon = icon;
-	notif.uCallbackMessage = WM_TRAYICON;
-	wcsncpy(notif.szTip, title, sizeof(notif.szTip) / sizeof(notif.szTip[0]));
+	sysicon_notif.cbSize = sizeof(sysicon_notif);
+	sysicon_notif.hWnd = hWnd;
+	sysicon_notif.uID = IDM_TRAYICON;
+	sysicon_notif.uFlags = NIF_STATE | NIF_ICON | NIF_MESSAGE | NIF_TIP;
+	sysicon_notif.dwState = 0;
+	sysicon_notif.dwStateMask = NIS_HIDDEN;
+	sysicon_notif.hIcon = icon;
+	sysicon_notif.uCallbackMessage = WM_TRAYICON;
 
-	while(!Shell_NotifyIcon(NIM_ADD, &notif) && GetLastError() == ERROR_TIMEOUT) {}
+	size_t tip_size = sizeof(sysicon_notif.szTip) / sizeof(sysicon_notif.szTip[0]);
+	wcsncpy(sysicon_notif.szTip, title, tip_size);
+	if(tip_size > 0)
+		sysicon_notif.szTip[tip_size - 1] = L'\0';
+
+	if(sysicon_alwaysTray) sysicon_addicon();
+}
+
+void	sysicon_addicon() {
+	if(sysicon_initialized) return;
+	sysicon_initialized = true;
+
+	while(!Shell_NotifyIcon(NIM_ADD, &sysicon_notif) && GetLastError() == ERROR_TIMEOUT) {}
 }
 
 void	sysicon_destroy(HWND hWnd)
 {
-	NOTIFYICONDATA notif;
-	notif.cbSize = sizeof(notif);
-	notif.hWnd = hWnd;
-	notif.uID = IDM_TRAYICON;
-	notif.uFlags = 0;
+	if(!sysicon_initialized) return;
 
-	Shell_NotifyIcon(NIM_DELETE, &notif);
-	return;
+	sysicon_notif.hWnd = hWnd;
+	sysicon_notif.uID = IDM_TRAYICON;
+	sysicon_notif.uFlags = 0;
+
+	Shell_NotifyIcon(NIM_DELETE, &sysicon_notif);
 }
 
 void	updateTrayTip(HWND hWnd, const wchar_t* title)
 {
-	NOTIFYICONDATA notif;
-	notif.cbSize = sizeof(notif);
-	notif.hWnd = hWnd;
-	notif.uID = IDM_TRAYICON;
-	notif.uFlags = NIF_TIP;
-
-	size_t tip_size = sizeof(notif.szTip) / sizeof(notif.szTip[0]);
-	wcsncpy(notif.szTip, title, tip_size);
+	size_t tip_size = sizeof(sysicon_notif.szTip) / sizeof(sysicon_notif.szTip[0]);
+	wcsncpy(sysicon_notif.szTip, title, tip_size);
 	if(tip_size > 0)
-		notif.szTip[tip_size - 1] = '\0';
+		sysicon_notif.szTip[tip_size - 1] = L'\0';
 
-	Shell_NotifyIcon(NIM_MODIFY, &notif);
+	if(!sysicon_initialized) return;
+
+	sysicon_notif.hWnd = hWnd;
+	sysicon_notif.uID = IDM_TRAYICON;
+	sysicon_notif.uFlags = NIF_TIP;
+
+	Shell_NotifyIcon(NIM_MODIFY, &sysicon_notif);
 }
 
 void	desktopToTray(HWND hWnd)
 {
-	NOTIFYICONDATA notif;
-	notif.cbSize = sizeof(notif);
-	notif.hWnd = hWnd;
-	notif.uID = IDM_TRAYICON;
-	notif.uFlags = NIF_STATE;
-	notif.dwState = 0;
-	notif.dwStateMask = NIS_HIDDEN;
+	sysicon_addicon();
 
-	if(!sysicon_alwaysTray) Shell_NotifyIcon(NIM_MODIFY, &notif);
+	if(!sysicon_alwaysTray) {
+		sysicon_notif.hWnd = hWnd;
+		sysicon_notif.uID = IDM_TRAYICON;
+		sysicon_notif.uFlags = NIF_STATE;
+		sysicon_notif.dwState = 0;
+		sysicon_notif.dwStateMask = NIS_HIDDEN;
+		Shell_NotifyIcon(NIM_MODIFY, &sysicon_notif);
+	}
+
 	SetWindowPos(hWnd, NULL, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_HIDEWINDOW);
 }
 
 void	trayToDesktop(HWND hWnd)
 {
-	NOTIFYICONDATA notif;
-	notif.cbSize = sizeof(notif);
-	notif.hWnd = hWnd;
-	notif.uID = IDM_TRAYICON;
-	notif.uFlags = NIF_STATE;
-	notif.dwState = NIS_HIDDEN;
-	notif.dwStateMask = NIS_HIDDEN;
+	if(sysicon_initialized && !sysicon_alwaysTray) {
+		sysicon_notif.hWnd = hWnd;
+		sysicon_notif.uID = IDM_TRAYICON;
+		sysicon_notif.uFlags = NIF_STATE;
+		sysicon_notif.dwState = NIS_HIDDEN;
+		sysicon_notif.dwStateMask = NIS_HIDDEN;
+		Shell_NotifyIcon(NIM_MODIFY, &sysicon_notif);
+	}
 
-	if(!sysicon_alwaysTray) Shell_NotifyIcon(NIM_MODIFY, &notif);
 	SetWindowPos(hWnd, NULL, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_SHOWWINDOW);
 	if(IsIconic(hWnd)) ShowWindow(hWnd, SW_RESTORE);
 }
