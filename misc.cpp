@@ -288,6 +288,12 @@ void	sysmenu_init(HWND hWnd)
 	mii.cch = (UINT) wcslen(mii.dwTypeData);
 	InsertMenuItem(hMenu, SC_CLOSE, FALSE, &mii);
 
+	mii.fType = MFT_STRING;
+	mii.wID = IDM_TOTRAY;
+	mii.dwTypeData = L"To Tray(&O)";
+	mii.cch = (UINT) wcslen(mii.dwTypeData);
+	InsertMenuItem(hMenu, SC_CLOSE, FALSE, &mii);
+
 	sysmenu_init_topmost(hWnd, hMenu);
 
     // sysmenu_init_subconfig(hWnd, hMenu);
@@ -462,11 +468,122 @@ BOOL	onSysCommand(HWND hWnd, DWORD id)
 		return(TRUE);
 	case IDM_TOPMOST:
 		return onTopMostMenuCommand(hWnd);
+	case IDM_TOTRAY:
+		if(IsWindowVisible(hWnd)) {
+			desktopToTray(hWnd);
+		}else{
+			trayToDesktop(hWnd);
+		}
+		return(TRUE);
 	}
     if(IDM_CONFIG_SELECT < id && id <= IDM_CONFIG_SELECT_MAX) {
         return onConfigMenuCommand(hWnd, id);
     }
 	return(FALSE);
+}
+
+/*----------*/
+
+bool	sysicon_addicon();
+
+bool	sysicon_initialized = false;
+bool	sysicon_alwaysTray = false;
+NOTIFYICONDATA	sysicon_notif;
+
+void	sysicon_init(HWND hWnd, HICON icon, const wchar_t* title, bool alwaysTray)
+{
+	sysicon_initialized = false;
+	sysicon_alwaysTray = alwaysTray;
+
+	sysicon_notif.cbSize = sizeof(sysicon_notif);
+	sysicon_notif.hWnd = hWnd;
+	sysicon_notif.uID = IDM_TRAYICON;
+	sysicon_notif.uFlags = NIF_STATE | NIF_ICON | NIF_MESSAGE | NIF_TIP;
+	sysicon_notif.dwState = 0;
+	sysicon_notif.dwStateMask = NIS_HIDDEN;
+	sysicon_notif.hIcon = icon;
+	sysicon_notif.uCallbackMessage = WM_TRAYICON;
+
+	size_t tip_size = sizeof(sysicon_notif.szTip) / sizeof(sysicon_notif.szTip[0]);
+	wcsncpy(sysicon_notif.szTip, title, tip_size);
+	if(tip_size > 0)
+		sysicon_notif.szTip[tip_size - 1] = L'\0';
+
+	if(sysicon_alwaysTray) sysicon_addicon();
+}
+
+bool	sysicon_addicon()
+{
+	if(!sysicon_initialized) {
+		for(int i = 0; i < 3; ++i) {
+			if(Shell_NotifyIcon(NIM_ADD, &sysicon_notif)) {
+				sysicon_initialized = true;
+				break;
+			}
+			if(GetLastError() != ERROR_TIMEOUT) break;
+			Sleep(1000);
+		}
+	}
+
+	return sysicon_initialized;
+}
+
+void	sysicon_destroy(HWND hWnd)
+{
+	if(!sysicon_initialized) return;
+
+	sysicon_notif.hWnd = hWnd;
+	sysicon_notif.uID = IDM_TRAYICON;
+	sysicon_notif.uFlags = 0;
+
+	Shell_NotifyIcon(NIM_DELETE, &sysicon_notif);
+}
+
+void	updateTrayTip(HWND hWnd, const wchar_t* title)
+{
+	size_t tip_size = sizeof(sysicon_notif.szTip) / sizeof(sysicon_notif.szTip[0]);
+	wcsncpy(sysicon_notif.szTip, title, tip_size);
+	if(tip_size > 0)
+		sysicon_notif.szTip[tip_size - 1] = L'\0';
+
+	if(!sysicon_initialized) return;
+
+	sysicon_notif.hWnd = hWnd;
+	sysicon_notif.uID = IDM_TRAYICON;
+	sysicon_notif.uFlags = NIF_TIP;
+
+	Shell_NotifyIcon(NIM_MODIFY, &sysicon_notif);
+}
+
+void	desktopToTray(HWND hWnd)
+{
+	if(!sysicon_addicon()) return;
+
+	if(!sysicon_alwaysTray) {
+		sysicon_notif.hWnd = hWnd;
+		sysicon_notif.uID = IDM_TRAYICON;
+		sysicon_notif.uFlags = NIF_STATE;
+		sysicon_notif.dwState = 0;
+		sysicon_notif.dwStateMask = NIS_HIDDEN;
+		Shell_NotifyIcon(NIM_MODIFY, &sysicon_notif);
+	}
+
+	SetWindowPos(hWnd, NULL, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_HIDEWINDOW);
+}
+
+void	trayToDesktop(HWND hWnd)
+{
+	if(sysicon_initialized && !sysicon_alwaysTray) {
+		sysicon_notif.hWnd = hWnd;
+		sysicon_notif.uID = IDM_TRAYICON;
+		sysicon_notif.uFlags = NIF_STATE;
+		sysicon_notif.dwState = NIS_HIDDEN;
+		sysicon_notif.dwStateMask = NIS_HIDDEN;
+		Shell_NotifyIcon(NIM_MODIFY, &sysicon_notif);
+	}
+
+	SetWindowPos(hWnd, NULL, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_SHOWWINDOW);
+	if(IsIconic(hWnd)) ShowWindow(hWnd, SW_RESTORE);
 }
 
 /* EOF */
