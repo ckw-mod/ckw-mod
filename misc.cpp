@@ -484,7 +484,7 @@ BOOL	onSysCommand(HWND hWnd, DWORD id)
 
 /*----------*/
 
-void	sysicon_addicon();
+bool	sysicon_addicon();
 
 bool	sysicon_initialized = false;
 bool	sysicon_alwaysTray = false;
@@ -512,11 +512,20 @@ void	sysicon_init(HWND hWnd, HICON icon, const wchar_t* title, bool alwaysTray)
 	if(sysicon_alwaysTray) sysicon_addicon();
 }
 
-void	sysicon_addicon() {
-	if(sysicon_initialized) return;
-	sysicon_initialized = true;
+bool	sysicon_addicon()
+{
+	if(!sysicon_initialized) {
+		for(int i = 0; i < 3; ++i) {
+			if(Shell_NotifyIcon(NIM_ADD, &sysicon_notif)) {
+				sysicon_initialized = true;
+				break;
+			}
+			if(GetLastError() != ERROR_TIMEOUT) break;
+			Sleep(1000);
+		}
+	}
 
-	while(!Shell_NotifyIcon(NIM_ADD, &sysicon_notif) && GetLastError() == ERROR_TIMEOUT) {}
+	return sysicon_initialized;
 }
 
 void	sysicon_destroy(HWND hWnd)
@@ -548,7 +557,7 @@ void	updateTrayTip(HWND hWnd, const wchar_t* title)
 
 void	desktopToTray(HWND hWnd)
 {
-	sysicon_addicon();
+	if(!sysicon_addicon()) return;
 
 	if(!sysicon_alwaysTray) {
 		sysicon_notif.hWnd = hWnd;
