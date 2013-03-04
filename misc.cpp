@@ -18,7 +18,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *---------------------------------------------------------------------------*/
-
+#define _CRT_SECURE_NO_WARNINGS 1
 #include <string>
 
 #include "ckw.h"
@@ -264,7 +264,7 @@ L" 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA."
 
 /*----------*/
 void	sysmenu_init_topmost(HWND hWnd, HMENU hMenu);
-void	sysmenu_init_subconfig(HWND hWnd, HMENU hMenu);
+//void	sysmenu_init_subconfig(HWND hWnd, HMENU hMenu);
 void	changeStateTopMostMenu(HWND hWnd, HMENU hMenu);
 
 void	sysmenu_init(HWND hWnd)
@@ -337,6 +337,7 @@ void	sysmenu_init_topmost(HWND hWnd, HMENU hMenu)
 	changeStateTopMostMenu(hWnd,hMenu);
 }
 
+/*
 void	sysmenu_init_subconfig(HWND hWnd, HMENU hMenu)
 {
 	MENUITEMINFO mii;
@@ -377,10 +378,12 @@ void	sysmenu_init_subconfig(HWND hWnd, HMENU hMenu)
 	mii.cch = (UINT) wcslen(mii.dwTypeData);
 	InsertMenuItem(hMenu, SC_CLOSE, FALSE, &mii);
 }
+*/
 
 void reloadConfig(wchar_t *path)
 {
 	char filepath[MAX_PATH+1];
+	if(wcstombs(NULL, path, 0) + 1 > sizeof(filepath) / sizeof(filepath[0])) return;
 	wcstombs(filepath, path, MAX_PATH);
 
 	ckOpt opt;
@@ -420,12 +423,12 @@ BOOL	onTopMostMenuCommand(HWND hWnd)
 	HMENU hMenu = GetSystemMenu(hWnd, FALSE);
 
 	UINT uState = GetMenuState( hMenu, IDM_TOPMOST, MF_BYCOMMAND);
-	DWORD dwExStyle = GetWindowLong(hWnd,GWL_EXSTYLE);
+	//DWORD dwExStyle = GetWindowLong(hWnd,GWL_EXSTYLE); // unused variable
 	if( uState & MFS_CHECKED )
 	{
-		SetWindowPos(hWnd, HWND_NOTOPMOST,NULL,NULL,NULL,NULL,SWP_NOMOVE | SWP_NOSIZE); 
+		SetWindowPos(hWnd, HWND_NOTOPMOST,0,0,0,0,SWP_NOMOVE | SWP_NOSIZE); 
 	}else{
-		SetWindowPos(hWnd, HWND_TOPMOST,NULL,NULL,NULL,NULL,SWP_NOMOVE | SWP_NOSIZE); 
+		SetWindowPos(hWnd, HWND_TOPMOST,0,0,0,0,SWP_NOMOVE | SWP_NOSIZE); 
 	}
 
 	changeStateTopMostMenu(hWnd, hMenu);

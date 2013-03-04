@@ -18,6 +18,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *---------------------------------------------------------------------------*/
+#define _CRT_SECURE_NO_WARNINGS 1
 #include "ckw.h"
 #include "ime_wrap.h"
 #include "rsrc.h"
@@ -533,8 +534,8 @@ void	onTimer(HWND hWnd)
 		__set_ime_position(hWnd);
 	}
 
-	int w = CSI_WndCols(gCSI);
-	int h = CSI_WndRows(gCSI);
+	DWORD w = CSI_WndCols(gCSI);
+	DWORD h = CSI_WndRows(gCSI);
 	if(gWinW != w || gWinH != h) {
 		w = (w * gFontW) + (gBorderSize * 2) + (gFrame.right - gFrame.left);
 		h = (h * gFontH) + (gBorderSize * 2) + (gFrame.bottom - gFrame.top);
@@ -682,7 +683,7 @@ static BOOL create_window(ckOpt& opt)
 	trace("create_window\n");
 
 	HINSTANCE hInstance = GetModuleHandle(NULL);
-	LPWSTR	className = L"CkwWindowClass";
+	LPCWSTR	className = L"CkwWindowClass";
 	const char*	conf_icon;
 	WNDCLASSEX wc;
 	DWORD	style = WS_OVERLAPPEDWINDOW;
@@ -1186,7 +1187,7 @@ static void _terminate()
 #endif
 
 /*----------*/
-int APIENTRY wWinMain(HINSTANCE hInst, HINSTANCE hPrev, LPWSTR lpCmdLine, int nCmdShow)
+int APIENTRY WinMain(HINSTANCE hInst, HINSTANCE hPrev, LPSTR lpCmdLine, int nCmdShow)
 {
 #ifdef _DEBUG
 	char *a = new char[1];

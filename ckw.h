@@ -7,6 +7,11 @@
 #include <windows.h>
 #include <wchar.h>
 
+#ifndef _MSC_VER // for gcc
+#include <ddk/ntapi.h>
+#define STARTF_TITLEISLINKNAME 0x00000800
+#endif
+
 #ifdef _MSC_VER
 #define strcasecmp _stricmp
 #endif

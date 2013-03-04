@@ -7,13 +7,13 @@ OBJ     = main.o \
           ime_wrap.o \
           misc.o
 
-DEFINES = -DNDEBUG -Dwcscat_s=wcscat
+DEFINES = -DNDEBUG
 # --------------------------------------------------------------------
 
 ifdef INSTDIR
-all: $(INSTDIR)\$(BIN)
+all: ver $(INSTDIR)\$(BIN)
 else
-all: $(BIN)
+all: ver $(BIN)
 endif
 
 $(INSTDIR)\$(BIN): $(BIN)
@@ -25,18 +25,21 @@ clean:
 CC      = gcc.exe
 CP      = g++.exe
 WINDRES = windres.exe -J rc -O coff --include-dir $(<D)
-CFLAGS  = -Os -Wall \
+CFLAGS  = -Os -Wall -Wextra \
+          -Wno-unused-parameter \
           -fno-rtti \
           -fno-exceptions \
           -fomit-frame-pointer \
-          -fmove-all-movables \
           -c $(DEFINES)
 LFLAGS  =
-LOPTS   = -Wl,--entry,_wWinMain,--enable-stdcall-fixup
-LIBS    = -s -mwindows -nostartfiles
+LOPTS   = -Wl,--enable-stdcall-fixup
+LIBS    = -s -mwindows -lshlwapi -static-libgcc -static-libstdc++
 
 
 # --------------------------------------------------------------------
+
+ver:
+	cmd /c version.bat > version.h
 
 $(BIN): $(OBJ) $(RES) makefile-gcc
 	$(CP) $(LFLAGS) $(OBJ) $(RES) $(LIBS) $(LOPTS) -o $(BIN)

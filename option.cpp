@@ -18,15 +18,17 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *---------------------------------------------------------------------------*/
+#define _CRT_SECURE_NO_WARNINGS 1
 #include "option.h"
 #include "version.h"
 #include <shlwapi.h>
+#include <stdio.h>
 
 static bool lookupColor(const char *str, COLORREF& ret)
 {
 	typedef struct {
 		COLORREF	color;
-		char		*name;
+		const char	*name;
 	} COLOR;
 	static const COLOR colors[] = {
 		{ RGB(0xF0,0xF8,0xFF), "alice blue" },
@@ -771,10 +773,11 @@ static bool lookupColor(const char *str, COLORREF& ret)
 
 	if(*str == '#') {
 		char	format[256];
+		int	format_size = sizeof(format) / sizeof(format[0]);
 		int	span = (int)(strlen(str)-1) / 3;
 		int	r, g, b;
-		sprintf_s(format, "%%%dx%%%dx%%%dx", span, span, span);
-		if(sscanf_s(str+1, format, &r, &g, &b) == 3) {
+		int format_ret = _snprintf(format, format_size, "%%%dx%%%dx%%%dx", span, span, span);
+		if(format_ret >= 0 && format_ret < format_size && sscanf(str+1, format, &r, &g, &b) == 3) {
 			if(span < 2) {
 				r <<= 4;
 				g <<= 4;
@@ -1036,7 +1039,7 @@ int	ckOpt::setOption(const char *name, const char *value, bool rsrc)
 
 
 	unsigned int i;
-	if(sscanf_s(name, "color%u", &i)==1 && 0<=i && i<=15) {
+	if(sscanf(name, "color%u", &i)==1 && i<=15) {
 		if(!value) return(0);
 		lookupColor(value, m_colors[i]);
 		return(2);
@@ -1115,7 +1118,7 @@ void	ckOpt::_loadXdefaults(const char *path)
 	FILE	*fp;
 	std::string app, name, value;
 
-	fopen_s(&fp, path, "r");
+	fp = fopen(path, "r");
 	if(!fp) return;
 
 	do {
@@ -1138,9 +1141,9 @@ void	ckOpt::_loadXdefaults(const char *path)
 
 void	ckOpt::setFile(const char *path /*=NULL*/)
 {
-    if(path)
+    if(path && strlen(path) + 1 <= sizeof(m_config_file) / sizeof(m_config_file[0]))
     {
-        strcpy_s(m_config_file, path);
+        strcpy(m_config_file, path);
     } else
     {
         m_config_file[0] = '\0';
@@ -1150,7 +1153,11 @@ void	ckOpt::setFile(const char *path /*=NULL*/)
 static bool getconfigfile(const char* env, char *cfgfile, char *path, int size)
 {
 	if(GetEnvironmentVariableA(env, path, size)) {
-		sprintf_s(path, size, "%s\\%s", path, cfgfile);
+		int format_ret =_snprintf(path, size, "%s\\%s", path, cfgfile);
+		if(format_ret < 0 || format_ret >= size) {
+			if(size > 0) path[0] = '\0';
+			return false;
+		}
 		if(PathFileExistsA(path) && !PathIsDirectoryA(path)) {
 			return true;
 		}
@@ -1167,36 +1174,42 @@ void ckOpt::loadXdefaults()
     char cfgfile[MAX_PATH] = "_";
 
     if (0 != GetModuleFileNameA(NULL, path, MAX_PATH)) {
-		char szDrive[MAX_PATH];
-		char szDir[MAX_PATH];
-		char szFile[MAX_PATH];
-		char szBuf[MAX_PATH];
-		_splitpath_s(path, szDrive, szDir, szFile, szBuf);
-		strcat_s(cfgfile, szFile);
+		char szDrive[_MAX_DRIVE];
+		char szDir[_MAX_DIR];
+		char szFile[_MAX_FNAME];
+		char szBuf[_MAX_EXT];
+		_splitpath(path, szDrive, szDir, szFile, szBuf);
 
-		path[0] = '\0';
-		// HOME or USERPROFILE
-		if (!getconfigfile("HOME", cfgfile, path, MAX_PATH)) {
-		  getconfigfile("USERPROFILE", cfgfile, path, MAX_PATH);
+		if(strlen(cfgfile) + strlen(szFile) + 1 <= sizeof(cfgfile) / sizeof(cfgfile[0])) {
+			strcat(cfgfile, szFile);
+
+			path[0] = '\0';
+			// HOME or USERPROFILE
+			if (!getconfigfile("HOME", cfgfile, path, MAX_PATH)) {
+			  getconfigfile("USERPROFILE", cfgfile, path, MAX_PATH);
+			}
+			if (path[0] != '\0') _loadXdefaults(path);
+
+			// directory execute exists
+			_makepath(path, szDrive, szDir, cfgfile, NULL);
+			_loadXdefaults(path);
+			_makepath(path, szDrive, szDir, szFile, ".cfg");
+			_loadXdefaults(path);
 		}
-		if (path[0] != '\0') _loadXdefaults(path);
-
-		// directory execute exists
-		_makepath_s(path, szDrive, szDir, cfgfile, NULL);
-		_loadXdefaults(path);
-		_makepath_s(path, szDrive, szDir, szFile, ".cfg");
-		_loadXdefaults(path);
     }
   }
   else
   {
     path[0] = '\0';
-    strcpy_s(path, m_config_file);
-    _loadXdefaults(path);
+    if(strlen(m_config_file) + 1 <= sizeof(path) / sizeof(path[0])) {
+      strcpy(path, m_config_file);
+      _loadXdefaults(path);
+    }
   }
 
-  if(GetEnvironmentVariableA("HOME", path, MAX_PATH)) {
-    strcat_s(path, "\\.Xdefaults");
+  const char *Xdefaults = "\\.Xdefaults";
+  if(GetEnvironmentVariableA("HOME", path, MAX_PATH) && strlen(path) + strlen(Xdefaults) + 1 <= sizeof(path) / sizeof(path[0])) {
+    strcat(path, Xdefaults);
     _loadXdefaults(path);
   }
 }
