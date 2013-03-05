@@ -38,6 +38,7 @@ public:
 	bool		isTranspColor()		{ return(m_isTranspColor); }
 	COLORREF	getTranspColor()	{ return(m_transpColor); }
 	bool		isTopMost()		{ return(m_isTopMost); }
+	int		getBgBmpPos()		{ return(m_bgBmpPos); }
 
 	const char*	getCmd()
 	{
@@ -101,6 +102,7 @@ private:
 	std::string	m_curDir;
 	std::string	m_title;
 	char	m_config_file[MAX_PATH+1];
+	int		m_bgBmpPos;
 };
 
 #endif /* __CK_OPT_H__ */
