@@ -38,6 +38,8 @@ public:
 	bool		isTranspColor()		{ return(m_isTranspColor); }
 	COLORREF	getTranspColor()	{ return(m_transpColor); }
 	bool		isTopMost()		{ return(m_isTopMost); }
+	bool		isCurBlink()		{ return(m_isCurBlink); }
+	int		getCurBlinkInt()	{ return(m_CurBlinkInt); }
 
 	const char*	getCmd()
 	{
@@ -101,6 +103,8 @@ private:
 	std::string	m_curDir;
 	std::string	m_title;
 	char	m_config_file[MAX_PATH+1];
+	bool		m_isCurBlink;
+	int		m_CurBlinkInt;
 };
 
 #endif /* __CK_OPT_H__ */
