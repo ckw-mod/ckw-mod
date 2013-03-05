@@ -48,6 +48,8 @@ BOOL	gVScrollHide = FALSE;
 
 BOOL	gImeOn = FALSE; /* IME-status */
 
+bool	gMinimizeToTray = false; /* minimize to task tray */
+
 /* screen buffer - copy */
 CONSOLE_SCREEN_BUFFER_INFO* gCSI = NULL;
 CHAR_INFO*	gScreen = NULL;
@@ -465,6 +467,7 @@ void	onTimer(HWND hWnd)
 			delete [] gTitle;
 			gTitle = str;
 			SetWindowText(hWnd, gTitle);
+			updateTrayTip(hWnd, gTitle);
 		}
 	}
 
@@ -556,6 +559,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 		SetTimer(hWnd, 0x3571, 10, NULL);
 		break;
 	case WM_DESTROY:
+		sysicon_destroy(hWnd);
+
 		KillTimer(hWnd, 0x3571);
 		PostQuitMessage(0);
 		if(WaitForSingleObject(gChild, 0) == WAIT_TIMEOUT)
@@ -578,7 +583,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 	case WM_WINDOWPOSCHANGED:
 		onWindowPosChange(hWnd, (WINDOWPOS*)lp);
 		selectionClear(hWnd);
-		break;
+
+		// WM_WINDOWPOSCHANGEDでDefWindowProcを呼ばないとWM_SIZEが送信されない
+		// http://msdn.microsoft.com/en-us/library/ms632652.aspx
+		return( DefWindowProc(hWnd, msg, wp, lp) );
 	case WM_LBUTTONDOWN:
 		onLBtnDown(hWnd, (short)LOWORD(lp), (short)HIWORD(lp));
 		break;
@@ -667,6 +675,27 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 			PostMessage(gConWnd, msg, wp, lp);
 		}
 		break;
+	case WM_TRAYICON:
+		switch(lp) {
+		case WM_LBUTTONUP:
+			if(IsWindowVisible(hWnd)) {
+				desktopToTray(hWnd);
+			}else{
+				trayToDesktop(hWnd);
+			}
+			break;
+		case WM_RBUTTONUP:
+			POINT curpos;
+			GetCursorPos(&curpos);
+			SendMessage(hWnd, 0x313, 0, curpos.x | (curpos.y << 16));
+			break;
+		}
+		break;
+	case WM_SIZE:
+		if(gMinimizeToTray && wp == SIZE_MINIMIZED) {
+			desktopToTray(hWnd);
+		}
+		return(0);
 	default:
 		return( DefWindowProc(hWnd, msg, wp, lp) );
 	}
@@ -708,9 +737,6 @@ static BOOL create_window(ckOpt& opt)
 		gVScrollHide = TRUE;
 	else
 		style |= WS_VSCROLL;
-
-	if(opt.isIconic())
-		style |= WS_MINIMIZE;
 
 	conf_icon = opt.getIcon();
 	if(!conf_icon || !conf_icon[0]){
@@ -786,6 +812,13 @@ static BOOL create_window(ckOpt& opt)
         }
 
 	sysmenu_init(hWnd);
+	sysicon_init(hWnd, iconsm, gTitle, opt.isAlwaysTray());
+
+	gMinimizeToTray = opt.isMinimizeToTray();
+
+	// メッセージで最小化しないとショートカットの「実行時の大きさ」などと干渉してうまく動かない
+	if(opt.isIconic())
+		SendMessage(hWnd, WM_SYSCOMMAND, SC_MINIMIZE, 0);
 
 	if(0 < opt.getTransp() && opt.getTransp() < 255)
 		SetLayeredWindowAttributes(hWnd, 0, opt.getTransp(), LWA_ALPHA);

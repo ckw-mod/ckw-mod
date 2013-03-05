@@ -2,6 +2,7 @@
 #define __CKW_H__ 1
 
 #define _WIN32_WINNT 0x0500
+#define _WIN32_IE 0x0500
 #define _UNICODE 1
 #define  UNICODE 1
 #include <windows.h>
@@ -46,5 +47,10 @@ void	onPasteFromClipboard(HWND hWnd);
 void	onDropFile(HDROP hDrop);
 void	sysmenu_init(HWND hWnd);
 BOOL	onSysCommand(HWND hWnd, DWORD id);
+void	sysicon_init(HWND hWnd, HICON icon, const wchar_t* title, bool alwaysTray);
+void	sysicon_destroy(HWND hWnd);
+void	updateTrayTip(HWND hWnd, const wchar_t* title);
+void	desktopToTray(HWND hWnd);
+void	trayToDesktop(HWND hWnd);
 
 #endif /* __CKW_H__ */
