@@ -48,6 +48,10 @@ BOOL	gVScrollHide = FALSE;
 
 BOOL	gImeOn = FALSE; /* IME-status */
 
+BOOL	gCurHide = FALSE;
+DWORD	gCurBlinkInt = 500;
+HANDLE	gCurBlinkThread = NULL;
+
 /* screen buffer - copy */
 CONSOLE_SCREEN_BUFFER_INFO* gCSI = NULL;
 CHAR_INFO*	gScreen = NULL;
@@ -101,6 +105,15 @@ void trace(const char *msg)
 
 /*****************************************************************************/
 
+DWORD WINAPI CurBlinkThreadFunc(LPVOID vdParam) {
+	HWND hWnd = (HWND)vdParam;
+	while(gConWnd) {
+		Sleep(gCurBlinkInt);
+		gCurHide = !gCurHide;
+		InvalidateRect(hWnd, NULL, TRUE);
+	}
+	return TRUE;
+}
 BOOL WINAPI ReadConsoleOutput_Unicode(HANDLE con, CHAR_INFO* buffer,
 				      COORD size, COORD pos, SMALL_RECT *sr)
 {
@@ -292,7 +305,8 @@ static void __draw_screen(HDC hDC)
 	__draw_selection(hDC);
 
 	/* draw cursor */
-	if(gCSI->srWindow.Top    <= gCSI->dwCursorPosition.Y &&
+	if(!gCurHide &&
+	   gCSI->srWindow.Top    <= gCSI->dwCursorPosition.Y &&
 	   gCSI->srWindow.Bottom >= gCSI->dwCursorPosition.Y &&
 	   gCSI->srWindow.Left   <= gCSI->dwCursorPosition.X &&
 	   gCSI->srWindow.Right  >= gCSI->dwCursorPosition.X) {
@@ -792,6 +806,12 @@ static BOOL create_window(ckOpt& opt)
 	else if(opt.isTranspColor())
 		SetLayeredWindowAttributes(hWnd, opt.getTranspColor(), 255, LWA_COLORKEY);
 
+	if(opt.isCurBlink()) {
+		DWORD id;
+		gCurBlinkInt = opt.getCurBlinkInt();
+		gCurBlinkThread = CreateThread(NULL, 0, CurBlinkThreadFunc, (LPVOID)hWnd, 0, &id);
+	}
+
 	ShowWindow(hWnd, SW_SHOW);
 	return(TRUE);
 }
@@ -1179,6 +1199,11 @@ static void _terminate()
 	SAFE_DeleteObject(gBgBrush);
 	SAFE_DeleteObject(gBgBmp);
 	ime_wrap_term();
+
+	if(gCurBlinkThread) {
+		WaitForSingleObject(gCurBlinkThread, INFINITE);
+		CloseHandle(gCurBlinkThread);
+	}
 }
 
 #ifdef _DEBUG
