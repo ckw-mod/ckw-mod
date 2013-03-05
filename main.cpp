@@ -48,6 +48,10 @@ BOOL	gVScrollHide = FALSE;
 
 BOOL	gImeOn = FALSE; /* IME-status */
 
+int		gBgBmpPosOpt = 0;
+POINT	gBgBmpPoint = { 0, 0 };
+POINT	gBgBmpSize = { 0, 0 };
+
 /* screen buffer - copy */
 CONSOLE_SCREEN_BUFFER_INFO* gCSI = NULL;
 CHAR_INFO*	gScreen = NULL;
@@ -329,6 +333,27 @@ void	onPaint(HWND hWnd)
 	HGDIOBJ	oldbmp  = SelectObject(hMemDC, hBmp);
 
 	FillRect(hMemDC, &rc, gBgBrush);
+
+	if((gBgBmp) && (gBgBmpPosOpt > 0)) {
+		HDC	hBgBmpDC = CreateCompatibleDC(hDC);
+		SelectObject(hBgBmpDC, gBgBmp);
+		switch(gBgBmpPosOpt) {
+		case 1:	case 2:	case 3:	case 4:
+			BitBlt(hMemDC,
+				   ((gBgBmpPosOpt == 1) || (gBgBmpPosOpt == 3)) ? 0 : rc.right  - gBgBmpSize.x,
+				   ((gBgBmpPosOpt == 1) || (gBgBmpPosOpt == 2)) ? 0 : rc.bottom - gBgBmpSize.y,
+				   gBgBmpSize.x, gBgBmpSize.y, hBgBmpDC, 0, 0, SRCCOPY);
+			break;
+		case 5:	case 6:	case 7:	default:
+			SetStretchBltMode(hBgBmpDC, COLORONCOLOR);
+			StretchBlt(hMemDC, 0, 0,
+					   gBgBmpPosOpt == 6 ? (int)(((double)rc.bottom / gBgBmpSize.y) * gBgBmpSize.x) : rc.right,
+					   gBgBmpPosOpt == 5 ? (int)(((double)rc.right  / gBgBmpSize.x) * gBgBmpSize.y) : rc.bottom,
+					   hBgBmpDC, 0, 0, gBgBmpSize.x, gBgBmpSize.y, SRCCOPY);
+			break;
+		}
+		DeleteDC(hBgBmpDC);
+	}
 
 	if(gScreen && gCSI) {
 		SetWindowOrgEx(hMemDC, -(int)gBorderSize, -(int)gBorderSize, NULL);
@@ -1095,7 +1120,17 @@ BOOL init_options(ckOpt& opt)
 		gBgBmp = (HBITMAP)LoadImageA(NULL, opt.getBgBmp(),
 				IMAGE_BITMAP, 0,0, LR_LOADFROMFILE);
 	}
-	if(gBgBmp)    gBgBrush = CreatePatternBrush(gBgBmp);
+	if(gBgBmp) {
+		gBgBmpPosOpt = opt.getBgBmpPos();
+		if(gBgBmpPosOpt == 0) {
+			gBgBrush = CreatePatternBrush(gBgBmp);
+		} else {
+			BITMAP bm;
+			GetObject(gBgBmp, sizeof(BITMAP), &bm);
+			gBgBmpSize.x = bm.bmWidth;
+			gBgBmpSize.y = bm.bmHeight;
+		}
+	}
 	if(!gBgBrush) gBgBrush = CreateSolidBrush(gColorTable[0]);
 
 	if(gTitle) delete [] gTitle;
