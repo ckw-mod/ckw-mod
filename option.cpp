@@ -971,6 +971,7 @@ ckOpt::ckOpt()
 	m_transpColor = 0;
 	m_isTopMost = false;
 	m_config_file[0] = '\0';
+	m_isCurBlink = false;
 }
 
 ckOpt::~ckOpt()
@@ -1033,6 +1034,7 @@ int	ckOpt::setOption(const char *name, const char *value, bool rsrc)
 	CHK_MISC("exec",		"x",		m_cmd = value);
 	CHK_MISC("title",		"tl",		m_title = value);
 	CHK_MISC("config",		"c",		setFile(value);loadXdefaults() );
+	CHK_BOOL("cursorBlink",		"crb",		m_isCurBlink);
 
 
 	unsigned int i;
@@ -1085,6 +1087,7 @@ static void usage(bool isLong)
 	"exec",			"x",		"string",	"exec shell",
 	"title",		"tl",		"string",	"window title",
 	"config",		"c",		"string",	"configration file",
+	"cursorBlink",		"crb",		"boolean",	"cursor blink",
 	};
 	unsigned int	i;
 
