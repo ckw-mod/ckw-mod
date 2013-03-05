@@ -972,7 +972,6 @@ ckOpt::ckOpt()
 	m_isTopMost = false;
 	m_config_file[0] = '\0';
 	m_isCurBlink = false;
-	m_CurBlinkInt = 500;
 }
 
 ckOpt::~ckOpt()
@@ -1036,7 +1035,6 @@ int	ckOpt::setOption(const char *name, const char *value, bool rsrc)
 	CHK_MISC("title",		"tl",		m_title = value);
 	CHK_MISC("config",		"c",		setFile(value);loadXdefaults() );
 	CHK_BOOL("cursorBlink",		"crb",		m_isCurBlink);
-	CHK_MISC("cursorBlinkInterval",	"crbi",		m_CurBlinkInt = atoi(value));
 
 
 	unsigned int i;
@@ -1090,7 +1088,6 @@ static void usage(bool isLong)
 	"title",		"tl",		"string",	"window title",
 	"config",		"c",		"string",	"configration file",
 	"cursorBlink",		"crb",		"boolean",	"cursor blink",
-	"cursorBlinkInterval",	"crbi",		"number",	"cursor blink interval",
 	};
 	unsigned int	i;
 

@@ -48,9 +48,8 @@ BOOL	gVScrollHide = FALSE;
 
 BOOL	gImeOn = FALSE; /* IME-status */
 
+BOOL	gCurBlink = FALSE;
 BOOL	gCurHide = FALSE;
-DWORD	gCurBlinkInt = 500;
-HANDLE	gCurBlinkThread = NULL;
 
 /* screen buffer - copy */
 CONSOLE_SCREEN_BUFFER_INFO* gCSI = NULL;
@@ -105,15 +104,6 @@ void trace(const char *msg)
 
 /*****************************************************************************/
 
-DWORD WINAPI CurBlinkThreadFunc(LPVOID vdParam) {
-	HWND hWnd = (HWND)vdParam;
-	while(gConWnd) {
-		Sleep(gCurBlinkInt);
-		gCurHide = !gCurHide;
-		InvalidateRect(hWnd, NULL, TRUE);
-	}
-	return TRUE;
-}
 BOOL WINAPI ReadConsoleOutput_Unicode(HANDLE con, CHAR_INFO* buffer,
 				      COORD size, COORD pos, SMALL_RECT *sr)
 {
@@ -512,6 +502,18 @@ void	onTimer(HWND hWnd)
 		sr.Top = sr.Bottom +1;
 	} while(sr.Top <= csi->srWindow.Bottom);
 
+	/* cursor blink */
+	if(gCurBlink) {
+		static DWORD caret_blink_time = (DWORD)GetCaretBlinkTime();
+		static DWORD next_time = 0;
+		DWORD now_time = GetTickCount();
+		if(now_time >= next_time) {
+			gCurHide = !gCurHide;
+			next_time = now_time + caret_blink_time;
+			InvalidateRect(hWnd, NULL, TRUE);
+		}
+	}
+
 	/* compare */
 	if(gScreen && gCSI &&
 	   !memcmp(csi, gCSI, sizeof(CONSOLE_SCREEN_BUFFER_INFO)) &&
@@ -805,12 +807,6 @@ static BOOL create_window(ckOpt& opt)
 		SetLayeredWindowAttributes(hWnd, 0, opt.getTransp(), LWA_ALPHA);
 	else if(opt.isTranspColor())
 		SetLayeredWindowAttributes(hWnd, opt.getTranspColor(), 255, LWA_COLORKEY);
-
-	if(opt.isCurBlink()) {
-		DWORD id;
-		gCurBlinkInt = opt.getCurBlinkInt();
-		gCurBlinkThread = CreateThread(NULL, 0, CurBlinkThreadFunc, (LPVOID)hWnd, 0, &id);
-	}
 
 	ShowWindow(hWnd, SW_SHOW);
 	return(TRUE);
@@ -1118,6 +1114,8 @@ BOOL init_options(ckOpt& opt)
 	if(gBgBmp)    gBgBrush = CreatePatternBrush(gBgBmp);
 	if(!gBgBrush) gBgBrush = CreateSolidBrush(gColorTable[0]);
 
+	gCurBlink = opt.isCurBlink();
+
 	if(gTitle) delete [] gTitle;
 	const char *conf_title = opt.getTitle();
 	if(!conf_title || !conf_title[0]){
@@ -1199,11 +1197,6 @@ static void _terminate()
 	SAFE_DeleteObject(gBgBrush);
 	SAFE_DeleteObject(gBgBmp);
 	ime_wrap_term();
-
-	if(gCurBlinkThread) {
-		WaitForSingleObject(gCurBlinkThread, INFINITE);
-		CloseHandle(gCurBlinkThread);
-	}
 }
 
 #ifdef _DEBUG
