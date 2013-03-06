@@ -973,6 +973,7 @@ ckOpt::ckOpt()
 	m_transpColor = 0;
 	m_isTopMost = false;
 	m_config_file[0] = '\0';
+	m_bgBmpPos = 0;
 }
 
 ckOpt::~ckOpt()
@@ -1037,6 +1038,7 @@ int	ckOpt::setOption(const char *name, const char *value, bool rsrc)
 	CHK_MISC("exec",		"x",		m_cmd = value);
 	CHK_MISC("title",		"tl",		m_title = value);
 	CHK_MISC("config",		"c",		setFile(value);loadXdefaults() );
+	CHK_MISC("backgroundBitmapPos",	"bitmappos",	m_bgBmpPos = atoi(value));
 
 
 	unsigned int i;
@@ -1091,6 +1093,7 @@ static void usage(bool isLong)
 	"exec",			"x",		"string",	"exec shell",
 	"title",		"tl",		"string",	"window title",
 	"config",		"c",		"string",	"configration file",
+	"backgroundBitmapPos",	"bitmappos",	"number",	"background bmp position. ( 0:tile 1:left-top 2:right-top 3:left-bottom 4:right-bottom 5:stretch-h 6:stretch-v 7:stretch-fill )",
 	};
 	unsigned int	i;
 
