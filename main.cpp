@@ -52,6 +52,8 @@ bool	gMinimizeToTray = false; /* minimize to task tray */
 int		gBgBmpPosOpt = 0;
 POINT	gBgBmpPoint = { 0, 0 };
 POINT	gBgBmpSize = { 0, 0 };
+BOOL	gCurBlink = FALSE;
+BOOL	gCurHide = FALSE;
 
 /* screen buffer - copy */
 CONSOLE_SCREEN_BUFFER_INFO* gCSI = NULL;
@@ -297,7 +299,8 @@ static void __draw_screen(HDC hDC)
 	__draw_selection(hDC);
 
 	/* draw cursor */
-	if(gCSI->srWindow.Top    <= gCSI->dwCursorPosition.Y &&
+	if(!gCurHide &&
+	   gCSI->srWindow.Top    <= gCSI->dwCursorPosition.Y &&
 	   gCSI->srWindow.Bottom >= gCSI->dwCursorPosition.Y &&
 	   gCSI->srWindow.Left   <= gCSI->dwCursorPosition.X &&
 	   gCSI->srWindow.Right  >= gCSI->dwCursorPosition.X) {
@@ -524,6 +527,18 @@ void	onTimer(HWND hWnd)
 		ptr += size.X * size.Y;
 		sr.Top = sr.Bottom +1;
 	} while(sr.Top <= csi->srWindow.Bottom);
+
+	/* cursor blink */
+	if(gCurBlink) {
+		static DWORD caret_blink_time = (DWORD)GetCaretBlinkTime();
+		static DWORD next_time = 0;
+		DWORD now_time = GetTickCount();
+		if(now_time >= next_time) {
+			gCurHide = !gCurHide;
+			next_time = now_time + caret_blink_time;
+			InvalidateRect(hWnd, NULL, TRUE);
+		}
+	}
 
 	/* compare */
 	if(gScreen && gCSI &&
@@ -1164,6 +1179,8 @@ BOOL init_options(ckOpt& opt)
 		}
 	}
 	if(!gBgBrush) gBgBrush = CreateSolidBrush(gColorTable[0]);
+
+	gCurBlink = opt.isCurBlink();
 
 	if(gTitle) delete [] gTitle;
 	const char *conf_title = opt.getTitle();

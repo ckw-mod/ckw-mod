@@ -974,6 +974,7 @@ ckOpt::ckOpt()
 	m_isTopMost = false;
 	m_config_file[0] = '\0';
 	m_bgBmpPos = 0;
+	m_isCurBlink = false;
 }
 
 ckOpt::~ckOpt()
@@ -1039,6 +1040,7 @@ int	ckOpt::setOption(const char *name, const char *value, bool rsrc)
 	CHK_MISC("title",		"tl",		m_title = value);
 	CHK_MISC("config",		"c",		setFile(value);loadXdefaults() );
 	CHK_MISC("backgroundBitmapPos",	"bitmappos",	m_bgBmpPos = atoi(value));
+	CHK_BOOL("cursorBlink",		"crb",		m_isCurBlink);
 
 
 	unsigned int i;
@@ -1094,6 +1096,7 @@ static void usage(bool isLong)
 	"title",		"tl",		"string",	"window title",
 	"config",		"c",		"string",	"configration file",
 	"backgroundBitmapPos",	"bitmappos",	"number",	"background bmp position. ( 0:tile 1:left-top 2:right-top 3:left-bottom 4:right-bottom 5:stretch-h 6:stretch-v 7:stretch-fill )",
+	"cursorBlink",		"crb",		"boolean",	"cursor blink",
 	};
 	unsigned int	i;
 
