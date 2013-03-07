@@ -963,6 +963,10 @@ static BOOL create_font(const char* name, int height)
 #include <winternl.h>
 #endif
 
+#ifndef _MSC_VER // for gcc
+#include <ddk/ntapi.h>
+#endif
+
 /*----------*/
 static void __hide_alloc_console()
 {
@@ -1007,11 +1011,13 @@ static void __hide_alloc_console()
 
 	/* check */
 	if(si.dwFlags == backup_flags && si.wShowWindow == backup_show) {
+#ifdef _MSC_VER
 		// è⁄ç◊ÇÕïsñæÇæÇ™STARTF_TITLEISLINKNAMEÇ™óßÇ¡ÇƒÇ¢ÇÈÇ∆ÅA
 		// ConsoleëãâBÇµÇ…é∏îsÇ∑ÇÈÇÃÇ≈èúãé(Win7-64bit)
 		if (*pflags & STARTF_TITLEISLINKNAME) {
 			*pflags &= ~STARTF_TITLEISLINKNAME;
 		}
+#endif
 		*pflags |= STARTF_USESHOWWINDOW;
 		*pshow  = SW_HIDE;
 		bResult = true;
@@ -1270,7 +1276,7 @@ static void _terminate()
 #endif
 
 /*----------*/
-int APIENTRY wWinMain(HINSTANCE hInst, HINSTANCE hPrev, LPWSTR lpCmdLine, int nCmdShow)
+int APIENTRY WinMain(HINSTANCE hInst, HINSTANCE hPrev, LPSTR lpCmdLine, int nCmdShow)
 {
 #ifdef _DEBUG
 	char *a = new char[1];
