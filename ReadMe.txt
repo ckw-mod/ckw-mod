@@ -12,7 +12,7 @@
   http://www.geocities.jp/cygwin_ck/
 
   改変版はGithubにて公開しています。
-  http://deflis.github.com/ckw-mod/
+  https://github.com/ckw-mod/ckw-mod
 
   このソフトウェアのライセンスは GNU General Public License v2です。
 
