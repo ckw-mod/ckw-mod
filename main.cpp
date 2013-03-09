@@ -868,8 +868,24 @@ static BOOL create_window(ckOpt& opt)
 	return(TRUE);
 }
 
+static BOOL set_current_directory(const char *dir)
+{
+	trace("set_current_directory\n");
+	if (!dir) return(TRUE);
+
+	std::string cwd = dir;
+	size_t index = cwd.find("\"");
+	if (index != std::string::npos) {
+		cwd.resize(index+1);
+		cwd[index] = '\\';
+	}
+	BOOL b = SetCurrentDirectoryA(cwd.c_str());
+
+	return b;
+}
+
 /*----------*/
-static BOOL create_child_process(const char* cmd, const char* curdir)
+static BOOL create_child_process(const char* cmd)
 {
 	trace("create_child_process\n");
 
@@ -895,12 +911,8 @@ static BOOL create_child_process(const char* cmd, const char* curdir)
 	si.hStdOutput = gStdOut;
 	si.hStdError  = gStdErr;
 
-	if (curdir)
-		if (char *p = strstr((char*)curdir, ":\""))
-			*(p+1) = '\\';
-
 	if(! CreateProcessA(NULL, buf, NULL, NULL, TRUE,
-			    0, NULL, curdir, &si, &pi)) {
+			    0, NULL, NULL, &si, &pi)) {
 		delete [] buf;
 		return(FALSE);
 	}
@@ -1224,7 +1236,10 @@ static BOOL initialize()
 		trace("create_font failed\n");
 		return(FALSE);
 	}
-	if(! create_child_process(opt.getCmd(), opt.getCurDir())) {
+	if (! set_current_directory(opt.getCurDir())) {
+		trace("set_current_directory failed\n");
+	}
+	if(! create_child_process(opt.getCmd())) {
 		trace("create_child_process failed\n");
 		return(FALSE);
 	}
