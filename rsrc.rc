@@ -1,6 +1,6 @@
 #include "version.h"
 #include "rsrc.h"
-#include "winuser.h"
+#include <winresrc.h>
 
 IDR_ICON ICON  "rsrc/icon.ico"
 
