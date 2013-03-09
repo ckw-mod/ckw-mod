@@ -21,6 +21,7 @@
 #include "option.h"
 #include "version.h"
 #include <shlwapi.h>
+#include <stdio.h>
 
 static bool lookupColor(const char *str, COLORREF& ret)
 {
@@ -773,7 +774,7 @@ static bool lookupColor(const char *str, COLORREF& ret)
 		char	format[256];
 		int	span = (int)(strlen(str)-1) / 3;
 		int	r, g, b;
-		sprintf_s(format, "%%%dx%%%dx%%%dx", span, span, span);
+		sprintf_s(format, sizeof(format) / sizeof(format[0]), "%%%dx%%%dx%%%dx", span, span, span);
 		if(sscanf_s(str+1, format, &r, &g, &b) == 3) {
 			if(span < 2) {
 				r <<= 4;

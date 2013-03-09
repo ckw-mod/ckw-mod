@@ -8,6 +8,10 @@
 #include <windows.h>
 #include <wchar.h>
 
+#ifndef _MSC_VER
+#include "compat.h"
+#endif
+
 #ifdef _MSC_VER
 #define strcasecmp _stricmp
 #endif
