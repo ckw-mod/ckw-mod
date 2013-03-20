@@ -14,7 +14,7 @@ LDLIBS = -lshlwapi
 RFLAGS = -J rc -O coff
 
 ifdef DEBUG
-CXXFLAGS = -g -Wall -Wextra $(INCLUDE)
+CXXFLAGS = -g -Wall -Wextra -Wno-unused-parameter $(INCLUDE)
 LDFLAGS = -mwindows -Wl,--enable-stdcall-fixup -static
 LDLIBS = -lshlwapi
 endif
