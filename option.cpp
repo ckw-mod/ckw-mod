@@ -27,7 +27,7 @@ static bool lookupColor(const char *str, COLORREF& ret)
 {
 	typedef struct {
 		COLORREF	color;
-		char		*name;
+		const char	*name;
 	} COLOR;
 	static const COLOR colors[] = {
 		{ RGB(0xF0,0xF8,0xFF), "alice blue" },
