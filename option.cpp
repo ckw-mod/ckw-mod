@@ -27,7 +27,7 @@ static bool lookupColor(const char *str, COLORREF& ret)
 {
 	typedef struct {
 		COLORREF	color;
-		char		*name;
+		const char	*name;
 	} COLOR;
 	static const COLOR colors[] = {
 		{ RGB(0xF0,0xF8,0xFF), "alice blue" },
@@ -1045,7 +1045,7 @@ int	ckOpt::setOption(const char *name, const char *value, bool rsrc)
 
 
 	unsigned int i;
-	if(sscanf_s(name, "color%u", &i)==1 && 0<=i && i<=15) {
+	if(sscanf_s(name, "color%u", &i)==1 && i<=15) {
 		if(!value) return(0);
 		lookupColor(value, m_colors[i]);
 		return(2);

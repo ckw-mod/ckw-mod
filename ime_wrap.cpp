@@ -39,7 +39,9 @@ HIMC WINAPI ImmGetContext(HWND hwnd)
 {
 	if(fn_GetContext)
 		return( fn_GetContext(hwnd) );
-	return(NULL);
+
+	HIMC imc = {0};
+	return(imc);
 }
 
 BOOL WINAPI ImmReleaseContext(HWND hwnd, HIMC imc)
