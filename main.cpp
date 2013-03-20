@@ -1243,6 +1243,18 @@ static BOOL initialize()
 		trace("create_child_process failed\n");
 		return(FALSE);
 	}
+	char exepath[MAX_PATH+1];
+	if (0 != GetModuleFileNameA(NULL, exepath, MAX_PATH)) {
+		char szDrive[MAX_PATH];
+		char szDir[MAX_PATH];
+		char szFile[MAX_PATH];
+		char szBuf[MAX_PATH];
+		_splitpath_s(exepath, szDrive, szDir, szFile, szBuf);
+		_makepath_s(exepath, szDrive, szDir, NULL, NULL);
+		if (! set_current_directory(exepath)) {
+			trace("set_current_directory failed\n");
+		}
+	}
 	if(! create_window(opt)) {
 		trace("create_window failed\n");
 		return(FALSE);
