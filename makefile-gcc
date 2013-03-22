@@ -10,17 +10,16 @@ CXXFLAGS = -O2 $(INCLUDE) \
            -fno-exceptions \
            -fomit-frame-pointer
 LDFLAGS = -mwindows -Wl,--enable-stdcall-fixup -static -s
-LDLIBS = -lshlwapi
+LDLIBS = -lshlwapi -limm32
 RFLAGS = -J rc -O coff
 
 ifdef DEBUG
 CXXFLAGS = -g -Wall -Wextra $(INCLUDE)
 LDFLAGS = -mwindows -Wl,--enable-stdcall-fixup -static
-LDLIBS = -lshlwapi
+LDLIBS = -lshlwapi -limm32
 endif
 
-SRCS = ime_wrap.cpp \
-       main.cpp \
+SRCS = main.cpp \
        misc.cpp \
        option.cpp \
        selection.cpp

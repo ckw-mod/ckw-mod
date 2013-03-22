@@ -19,8 +19,8 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *---------------------------------------------------------------------------*/
 #include "ckw.h"
-#include "ime_wrap.h"
 #include "rsrc.h"
+#include <imm.h>
 
 /*****************************************************************************/
 
@@ -1221,10 +1221,6 @@ static BOOL initialize()
 {
 	ckOpt opt;
 
-	if(! ime_wrap_init()) {
-		trace("ime_wrap_init failed\n");
-	}
-
 	if(! init_options(opt)) {
 		return(FALSE);
 	}
@@ -1285,7 +1281,6 @@ static void _terminate()
 	SAFE_DeleteObject(gFont);
 	SAFE_DeleteObject(gBgBrush);
 	SAFE_DeleteObject(gBgBmp);
-	ime_wrap_term();
 }
 
 #ifdef _DEBUG

@@ -1,12 +1,12 @@
 TARGET = ckw.exe
-OBJ = main.obj selection.obj misc.obj option.obj ime_wrap.obj rsrc.res
+OBJ = main.obj selection.obj misc.obj option.obj rsrc.res
 
 #CFLAGS = -nologo -MLd -Od -W3 -GX -D_DEBUG
 CFLAGS = -nologo -MT -O2 -W3 -EHsc -DNDEBUG
 LDFLAGS = -nologo
 
 UINC = 
-ULIB = user32.lib gdi32.lib shell32.lib shlwapi.lib
+ULIB = user32.lib gdi32.lib shell32.lib shlwapi.lib imm32.lib
 
 .SUFFIXES: .exe .obj .cpp .rc .res
 
