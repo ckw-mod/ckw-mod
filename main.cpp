@@ -575,8 +575,8 @@ void	onTimer(HWND hWnd)
 		__set_ime_position(hWnd);
 	}
 
-	int w = CSI_WndCols(gCSI);
-	int h = CSI_WndRows(gCSI);
+	DWORD w = CSI_WndCols(gCSI);
+	DWORD h = CSI_WndRows(gCSI);
 	if(gWinW != w || gWinH != h) {
 		w = (w * gFontW) + (gBorderSize * 2) + (gFrame.right - gFrame.left);
 		h = (h * gFontH) + (gBorderSize * 2) + (gFrame.bottom - gFrame.top);
@@ -750,7 +750,7 @@ static BOOL create_window(ckOpt& opt)
 	trace("create_window\n");
 
 	HINSTANCE hInstance = GetModuleHandle(NULL);
-	LPWSTR	className = L"CkwWindowClass";
+	LPCWSTR	className = L"CkwWindowClass";
 	const char*	conf_icon;
 	WNDCLASSEX wc;
 	DWORD	style = WS_OVERLAPPEDWINDOW;
