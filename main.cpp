@@ -1058,9 +1058,21 @@ static void __hide_alloc_console()
 	}
 }
 
+static void _terminate();
+
 /*----------*/
 BOOL WINAPI sig_handler(DWORD n)
 {
+	switch(n) {
+	case CTRL_CLOSE_EVENT:
+	case CTRL_LOGOFF_EVENT:
+	case CTRL_SHUTDOWN_EVENT:
+		_terminate();
+		ExitProcess(0);
+		break;
+	default:
+		break;
+	}
 	return(TRUE);
 }
 
