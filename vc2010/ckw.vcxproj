@@ -93,7 +93,7 @@
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>shlwapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>shlwapi.lib;imm32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <TargetMachine>MachineX86</TargetMachine>
     </Link>
@@ -112,7 +112,7 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>shlwapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>shlwapi.lib;imm32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -165,7 +165,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\ime_wrap.cpp" />
     <ClCompile Include="..\main.cpp" />
     <ClCompile Include="..\misc.cpp" />
     <ClCompile Include="..\option.cpp" />
@@ -173,7 +172,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\ckw.h" />
-    <ClInclude Include="..\ime_wrap.h" />
     <ClInclude Include="..\option.h" />
     <ClInclude Include="..\rsrc.h" />
     <ClInclude Include="..\version.h" />
