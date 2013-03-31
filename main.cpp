@@ -879,8 +879,14 @@ static BOOL set_current_directory(const char *dir)
 		cwd.resize(index+1);
 		cwd[index] = '\\';
 	}
-	BOOL b = SetCurrentDirectoryA(cwd.c_str());
 
+	DWORD bufferSize = ExpandEnvironmentStringsA(cwd.c_str(), NULL, 0);
+	char* expandedCwd = new char[bufferSize];
+	ExpandEnvironmentStringsA(cwd.c_str(), expandedCwd, bufferSize);
+
+	BOOL b = SetCurrentDirectoryA(expandedCwd);
+
+	delete expandedCwd;
 	return b;
 }
 
