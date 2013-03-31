@@ -1202,8 +1202,14 @@ BOOL init_options(ckOpt& opt)
 	gLineSpace = opt.getLineSpace();
 
 	if(opt.getBgBmp()) {
-		gBgBmp = (HBITMAP)LoadImageA(NULL, opt.getBgBmp(),
+		DWORD bufferSize = ExpandEnvironmentStringsA(opt.getBgBmp(), NULL, 0);
+		char* expandedBmpPath = new char[bufferSize];
+		ExpandEnvironmentStringsA(opt.getBgBmp(), expandedBmpPath, bufferSize);
+
+		gBgBmp = (HBITMAP)LoadImageA(NULL, expandedBmpPath,
 				IMAGE_BITMAP, 0,0, LR_LOADFROMFILE);
+
+		delete expandedBmpPath;
 	}
 	if(gBgBmp) {
 		gBgBmpPosOpt = opt.getBgBmpPos();
