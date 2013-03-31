@@ -908,6 +908,10 @@ static BOOL create_child_process(const char* cmd)
 		strcpy(buf, cmd);
 	}
 
+	DWORD bufferSize = ExpandEnvironmentStringsA(buf, NULL, 0);
+	char* expandedCmd = new char[bufferSize];
+	ExpandEnvironmentStringsA(buf, expandedCmd, bufferSize);
+
 	PROCESS_INFORMATION pi;
 	STARTUPINFOA si;
 	memset(&si, 0, sizeof(si));
@@ -917,12 +921,14 @@ static BOOL create_child_process(const char* cmd)
 	si.hStdOutput = gStdOut;
 	si.hStdError  = gStdErr;
 
-	if(! CreateProcessA(NULL, buf, NULL, NULL, TRUE,
+	if(! CreateProcessA(NULL, expandedCmd, NULL, NULL, TRUE,
 			    0, NULL, NULL, &si, &pi)) {
 		delete [] buf;
+		delete [] expandedCmd;
 		return(FALSE);
 	}
 	delete [] buf;
+	delete [] expandedCmd;
 	CloseHandle(pi.hThread);
 	gChild = pi.hProcess;
 	return(TRUE);
