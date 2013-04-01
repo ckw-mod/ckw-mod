@@ -886,7 +886,7 @@ static BOOL set_current_directory(const char *dir)
 
 	BOOL b = SetCurrentDirectoryA(expandedCwd);
 
-	delete expandedCwd;
+	delete[] expandedCwd;
 	return b;
 }
 
@@ -1215,7 +1215,7 @@ BOOL init_options(ckOpt& opt)
 		gBgBmp = (HBITMAP)LoadImageA(NULL, expandedBmpPath,
 				IMAGE_BITMAP, 0,0, LR_LOADFROMFILE);
 
-		delete expandedBmpPath;
+		delete[] expandedBmpPath;
 	}
 	if(gBgBmp) {
 		gBgBmpPosOpt = opt.getBgBmpPos();
