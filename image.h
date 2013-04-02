@@ -3,7 +3,9 @@
 
 #include "ckw.h"
 #include <wincodec.h>
-IWICBitmapSource* CreateBitmapSourceFromFile(LPCSTR lpname);
-HBITMAP CreateHBITMAPFromBitmapSource(IWICBitmapSource* ipBitmap);
+HBITMAP createHBITMAPFromFile(LPCSTR path);
+BOOL isOSGreaterThan2k();
+IWICBitmapSource* createBitmapSourceFromFile(LPCSTR lpname);
+HBITMAP createHBITMAPFromBitmapSource(IWICBitmapSource* ipBitmap);
 
 #endif /* __CKW_IMAGE_H__ */

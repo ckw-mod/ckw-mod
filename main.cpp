@@ -1197,11 +1197,7 @@ BOOL init_options(ckOpt& opt)
 	gLineSpace = opt.getLineSpace();
 
 	if(opt.getBgBmp()) {
-		IWICBitmapSource *bitmapSource = CreateBitmapSourceFromFile(opt.getBgBmp());
-		if (bitmapSource) {
-			gBgBmp = CreateHBITMAPFromBitmapSource(bitmapSource);
-			bitmapSource->Release();
-		}
+		gBgBmp = createHBITMAPFromFile(opt.getBgBmp());
 	}
 	if(gBgBmp) {
 		gBgBmpPosOpt = opt.getBgBmpPos();

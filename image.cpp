@@ -44,12 +44,39 @@
 #include <wincodec.h>
 #include <wincodecsdk.h>
 
-IWICBitmapSource* CreateBitmapSourceFromFile(LPCSTR lpname)
+HBITMAP createHBITMAPFromFile(LPCSTR path) {
+	HBITMAP bmp;
+
+	if (isOSGreaterThan2k()) {
+		// Load image using WIC
+		IWICBitmapSource *bitmapSource = createBitmapSourceFromFile(path);
+		if (bitmapSource) {
+			bmp = createHBITMAPFromBitmapSource(bitmapSource);
+			bitmapSource->Release();
+		}
+	}
+	else {
+		// Load image using Win32 API. Only BMP is supported
+		bmp = (HBITMAP)LoadImageA(NULL, path, IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
+	}
+
+	return bmp;
+}
+
+BOOL isOSGreaterThan2k() {
+	OSVERSIONINFO osVer;
+	osVer.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
+	GetVersionEx( &osVer );
+
+	return (osVer.dwMajorVersion > 5) || (osVer.dwMajorVersion == 5 && osVer.dwMajorVersion > 0);
+}
+
+IWICBitmapSource* createBitmapSourceFromFile(LPCSTR path)
 {
 	HRESULT hr;
-	size_t wbufSize = MultiByteToWideChar(CP_OEMCP, MB_PRECOMPOSED, lpname, -1, NULL, 0);
-	LPWSTR wstr = new WCHAR[wbufSize];
-	MultiByteToWideChar(CP_OEMCP, MB_PRECOMPOSED, lpname, -1, wstr, wbufSize);
+	size_t wbufSize = MultiByteToWideChar(CP_OEMCP, MB_PRECOMPOSED, path, -1, NULL, 0);
+	LPWSTR wpath = new WCHAR[wbufSize];
+	MultiByteToWideChar(CP_OEMCP, MB_PRECOMPOSED, path, -1, wpath, wbufSize);
 
 	IWICImagingFactory* wicFactory = NULL;
 	IWICBitmapDecoder* decoder = NULL;
@@ -58,7 +85,7 @@ IWICBitmapSource* CreateBitmapSourceFromFile(LPCSTR lpname)
 
 	hr = CoCreateInstance(CLSID_WICImagingFactory, NULL, CLSCTX_INPROC_SERVER, IID_IWICImagingFactory, reinterpret_cast<LPVOID *>(&wicFactory));
 	if(SUCCEEDED(hr)) {
-		hr = wicFactory->CreateDecoderFromFilename(wstr, NULL, GENERIC_READ, WICDecodeMetadataCacheOnLoad, &decoder);
+		hr = wicFactory->CreateDecoderFromFilename(wpath, NULL, GENERIC_READ, WICDecodeMetadataCacheOnLoad, &decoder);
 	}
 	if(SUCCEEDED(hr)) {
 		hr = decoder->GetFrame(0, &frame);
@@ -70,7 +97,7 @@ IWICBitmapSource* CreateBitmapSourceFromFile(LPCSTR lpname)
 		hr = WICConvertBitmapSource(GUID_WICPixelFormat32bppPBGRA, frame, &ipBitmap);
 	}
 
-	delete[] wstr;
+	delete[] wpath;
 	if (frame) {
 		frame->Release();
 	}
@@ -84,7 +111,7 @@ IWICBitmapSource* CreateBitmapSourceFromFile(LPCSTR lpname)
 	return ipBitmap;
  }
 
-HBITMAP CreateHBITMAPFromBitmapSource(IWICBitmapSource * ipBitmap)
+HBITMAP createHBITMAPFromBitmapSource(IWICBitmapSource * ipBitmap)
 {
     // initialize return value
     HBITMAP hbmp = NULL;
