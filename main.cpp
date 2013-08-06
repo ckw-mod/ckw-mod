@@ -54,6 +54,7 @@ POINT	gBgBmpPoint = { 0, 0 };
 POINT	gBgBmpSize = { 0, 0 };
 BOOL	gCurBlink = FALSE;
 BOOL	gCurHide = FALSE;
+BOOL	gFocus = FALSE;
 
 /* screen buffer - copy */
 CONSOLE_SCREEN_BUFFER_INFO* gCSI = NULL;
@@ -529,7 +530,7 @@ void	onTimer(HWND hWnd)
 	} while(sr.Top <= csi->srWindow.Bottom);
 
 	/* cursor blink */
-	if(gCurBlink) {
+	if(gCurBlink && (gFocus || gCurHide)) {
 		static DWORD caret_blink_time = (DWORD)GetCaretBlinkTime();
 		static DWORD next_time = 0;
 		DWORD now_time = GetTickCount();
@@ -729,6 +730,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 			SendMessage(hWnd, 0x313, 0, curpos.x | (curpos.y << 16));
 			break;
 		}
+		break;
+	case WM_SETFOCUS:
+		gFocus = TRUE;
+		break;
+	case WM_KILLFOCUS:
+		gFocus = FALSE;
 		break;
 	case WM_SIZE:
 		if(gMinimizeToTray && wp == SIZE_MINIMIZED) {
