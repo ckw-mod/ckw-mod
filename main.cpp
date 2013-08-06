@@ -55,6 +55,7 @@ POINT	gBgBmpSize = { 0, 0 };
 BOOL	gCurBlink = FALSE;
 BOOL	gCurHide = FALSE;
 BOOL	gFocus = FALSE;
+DWORD	gCurBlinkNext = 0;
 
 /* screen buffer - copy */
 CONSOLE_SCREEN_BUFFER_INFO* gCSI = NULL;
@@ -532,11 +533,10 @@ void	onTimer(HWND hWnd)
 	/* cursor blink */
 	if(gCurBlink && (gFocus || gCurHide)) {
 		static DWORD caret_blink_time = (DWORD)GetCaretBlinkTime();
-		static DWORD next_time = 0;
-		DWORD now_time = GetTickCount();
-		if(now_time >= next_time) {
+		DWORD curr = GetTickCount();
+		if(curr >= gCurBlinkNext) {
 			gCurHide = !gCurHide;
-			next_time = now_time + caret_blink_time;
+			gCurBlinkNext = curr + caret_blink_time;
 			InvalidateRect(hWnd, NULL, TRUE);
 		}
 	}
@@ -694,6 +694,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 			PostMessage(gConWnd, msg, wp, lp);
 		break;
 	case WM_KEYDOWN:
+		if(gCurBlink) gCurBlinkNext = GetTickCount() + (gCurHide? 0: GetCaretBlinkTime());
 	case WM_KEYUP:
 		if((wp == VK_NEXT || wp == VK_PRIOR ||
 		    wp == VK_HOME || wp == VK_END) &&
