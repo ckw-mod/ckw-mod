@@ -53,7 +53,9 @@ int		gBgBmpPosOpt = 0;
 POINT	gBgBmpPoint = { 0, 0 };
 POINT	gBgBmpSize = { 0, 0 };
 BOOL	gCurBlink = FALSE;
+DWORD	gCurBlinkNext = 0;
 BOOL	gCurHide = FALSE;
+BOOL	gFocus = FALSE;
 
 /* screen buffer - copy */
 CONSOLE_SCREEN_BUFFER_INFO* gCSI = NULL;
@@ -299,24 +301,32 @@ static void __draw_screen(HDC hDC)
 	__draw_selection(hDC);
 
 	/* draw cursor */
-	if(!gCurHide &&
-	   gCSI->srWindow.Top    <= gCSI->dwCursorPosition.Y &&
+	if(gCSI->srWindow.Top    <= gCSI->dwCursorPosition.Y &&
 	   gCSI->srWindow.Bottom >= gCSI->dwCursorPosition.Y &&
 	   gCSI->srWindow.Left   <= gCSI->dwCursorPosition.X &&
 	   gCSI->srWindow.Right  >= gCSI->dwCursorPosition.X) {
 		color_fg = (gImeOn) ? kColorCursorImeFg : kColorCursorFg;
 		color_bg = (gImeOn) ? kColorCursorImeBg : kColorCursorBg;
-		SetTextColor(hDC, gColorTable[ color_fg ]);
-		SetBkColor(  hDC, gColorTable[ color_bg ]);
-		SetBkMode(hDC, OPAQUE);
 		pntX = gCSI->dwCursorPosition.X - gCSI->srWindow.Left;
 		pntY = gCSI->dwCursorPosition.Y - gCSI->srWindow.Top;
 		ptr = gScreen + CSI_WndCols(gCSI) * pntY + pntX;
 		pntX *= gFontW;
 		pntY *= gFontH;
 		*work_width = (ptr->Attributes & COMMON_LVB_LEADING_BYTE) ? gFontW*2 : gFontW;
-		ExtTextOut(hDC, pntX, pntY, 0, NULL,
-			   &ptr->Char.UnicodeChar, 1, work_width);
+		if(!gFocus){
+			HPEN hPen = CreatePen(PS_SOLID, 1, gColorTable[ color_bg ]);
+			HPEN hOldPen = (HPEN)SelectObject(hDC, hPen);
+			HBRUSH hOldBrush = (HBRUSH)SelectObject(hDC, GetStockObject(NULL_BRUSH));
+			Rectangle(hDC, pntX, pntY, pntX+(*work_width), pntY+gFontH);
+			SelectObject(hDC, hOldPen); DeleteObject(hPen);
+			SelectObject(hDC, hOldBrush);
+		}else if(!gCurHide){
+			SetTextColor(hDC, gColorTable[ color_fg ]);
+			SetBkColor(  hDC, gColorTable[ color_bg ]);
+			SetBkMode(hDC, OPAQUE);
+			ExtTextOut(hDC, pntX, pntY, 0, NULL,
+					&ptr->Char.UnicodeChar, 1, work_width);
+		}
 	}
 
 	delete [] work_width;
@@ -529,13 +539,12 @@ void	onTimer(HWND hWnd)
 	} while(sr.Top <= csi->srWindow.Bottom);
 
 	/* cursor blink */
-	if(gCurBlink) {
+	if(gCurBlink && gFocus) {
 		static DWORD caret_blink_time = (DWORD)GetCaretBlinkTime();
-		static DWORD next_time = 0;
-		DWORD now_time = GetTickCount();
-		if(now_time >= next_time) {
+		DWORD curr = GetTickCount();
+		if(curr >= gCurBlinkNext) {
 			gCurHide = !gCurHide;
-			next_time = now_time + caret_blink_time;
+			gCurBlinkNext = curr + caret_blink_time;
 			InvalidateRect(hWnd, NULL, TRUE);
 		}
 	}
@@ -693,6 +702,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 			PostMessage(gConWnd, msg, wp, lp);
 		break;
 	case WM_KEYDOWN:
+		if(gCurBlink) gCurBlinkNext = GetTickCount() + (gCurHide? 0: GetCaretBlinkTime());
 	case WM_KEYUP:
 		if((wp == VK_NEXT || wp == VK_PRIOR ||
 		    wp == VK_HOME || wp == VK_END) &&
@@ -729,6 +739,15 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 			SendMessage(hWnd, 0x313, 0, curpos.x | (curpos.y << 16));
 			break;
 		}
+		break;
+	case WM_SETFOCUS:
+		gFocus = TRUE;
+		if(gCurBlink) gCurBlinkNext = GetTickCount() + (gCurHide? 0: GetCaretBlinkTime());
+		InvalidateRect(hWnd, NULL, TRUE);
+		break;
+	case WM_KILLFOCUS:
+		gFocus = FALSE;
+		InvalidateRect(hWnd, NULL, TRUE);
 		break;
 	case WM_SIZE:
 		if(gMinimizeToTray && wp == SIZE_MINIMIZED) {
