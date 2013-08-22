@@ -898,8 +898,14 @@ static BOOL set_current_directory(const char *dir)
 		cwd.resize(index+1);
 		cwd[index] = '\\';
 	}
-	BOOL b = SetCurrentDirectoryA(cwd.c_str());
 
+	DWORD bufferSize = ExpandEnvironmentStringsA(cwd.c_str(), NULL, 0);
+	char* expandedCwd = new char[bufferSize];
+	ExpandEnvironmentStringsA(cwd.c_str(), expandedCwd, bufferSize);
+
+	BOOL b = SetCurrentDirectoryA(expandedCwd);
+
+	delete[] expandedCwd;
 	return b;
 }
 
@@ -921,6 +927,10 @@ static BOOL create_child_process(const char* cmd)
 		strcpy(buf, cmd);
 	}
 
+	DWORD bufferSize = ExpandEnvironmentStringsA(buf, NULL, 0);
+	char* expandedCmd = new char[bufferSize];
+	ExpandEnvironmentStringsA(buf, expandedCmd, bufferSize);
+
 	PROCESS_INFORMATION pi;
 	STARTUPINFOA si;
 	memset(&si, 0, sizeof(si));
@@ -930,12 +940,14 @@ static BOOL create_child_process(const char* cmd)
 	si.hStdOutput = gStdOut;
 	si.hStdError  = gStdErr;
 
-	if(! CreateProcessA(NULL, buf, NULL, NULL, TRUE,
+	if(! CreateProcessA(NULL, expandedCmd, NULL, NULL, TRUE,
 			    0, NULL, NULL, &si, &pi)) {
 		delete [] buf;
+		delete [] expandedCmd;
 		return(FALSE);
 	}
 	delete [] buf;
+	delete [] expandedCmd;
 	CloseHandle(pi.hThread);
 	gChild = pi.hProcess;
 	return(TRUE);
@@ -1215,8 +1227,14 @@ BOOL init_options(ckOpt& opt)
 	gLineSpace = opt.getLineSpace();
 
 	if(opt.getBgBmp()) {
-		gBgBmp = (HBITMAP)LoadImageA(NULL, opt.getBgBmp(),
+		DWORD bufferSize = ExpandEnvironmentStringsA(opt.getBgBmp(), NULL, 0);
+		char* expandedBmpPath = new char[bufferSize];
+		ExpandEnvironmentStringsA(opt.getBgBmp(), expandedBmpPath, bufferSize);
+
+		gBgBmp = (HBITMAP)LoadImageA(NULL, expandedBmpPath,
 				IMAGE_BITMAP, 0,0, LR_LOADFROMFILE);
+
+		delete[] expandedBmpPath;
 	}
 	if(gBgBmp) {
 		gBgBmpPosOpt = opt.getBgBmpPos();
