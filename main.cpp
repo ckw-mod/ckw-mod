@@ -19,6 +19,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *---------------------------------------------------------------------------*/
 #include "ckw.h"
+#include "image.h"
 #include "rsrc.h"
 #include <imm.h>
 
@@ -1215,8 +1216,7 @@ BOOL init_options(ckOpt& opt)
 	gLineSpace = opt.getLineSpace();
 
 	if(opt.getBgBmp()) {
-		gBgBmp = (HBITMAP)LoadImageA(NULL, opt.getBgBmp(),
-				IMAGE_BITMAP, 0,0, LR_LOADFROMFILE);
+		gBgBmp = createHBITMAPFromFile(opt.getBgBmp());
 	}
 	if(gBgBmp) {
 		gBgBmpPosOpt = opt.getBgBmpPos();
@@ -1336,6 +1336,7 @@ int APIENTRY WinMain(HINSTANCE hInst, HINSTANCE hPrev, LPSTR lpCmdLine, int nCmd
 	_CrtSetReportFile( _CRT_ERROR,  _CRTDBG_FILE_STDERR );
 #endif
 
+	CoInitialize(NULL);
 	if(initialize()) {
 		MSG msg;
 		while(GetMessage(&msg, NULL, 0,0)) {
@@ -1344,6 +1345,7 @@ int APIENTRY WinMain(HINSTANCE hInst, HINSTANCE hPrev, LPSTR lpCmdLine, int nCmd
 		}
 	}
 	_terminate();
+	CoUninitialize();
 	return(0);
 }
 
