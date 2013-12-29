@@ -48,6 +48,7 @@ public:
 		return((m_cmd.size()) ? m_cmd.c_str() : NULL);
 	}
 	int		getFontSize()		{ return(m_fontSize); }
+	int		getFontSpace()		{ return(m_fontSpace); }
 	const char*	getFont()
 	{
 		return((m_font.size()) ? m_font.c_str() : NULL);
@@ -86,6 +87,7 @@ private:
 	std::string	m_cmd;
 	std::string	m_font;
 	int		m_fontSize;
+	int		m_fontSpace;
 	COLORREF	m_colorFg;
 	COLORREF	m_colorBg;
 	COLORREF	m_colorCursor;
