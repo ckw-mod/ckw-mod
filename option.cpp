@@ -1002,6 +1002,43 @@ ckOpt::~ckOpt()
 		return(1); \
 	}
 
+#define IS_NPOS(pos) (std::string::npos == (pos))
+static bool getParentDir(std::string &strDest){
+	int slash = strDest.find_last_of("/", strDest.size()-2);
+	int bslash = strDest.find_last_of("\\", strDest.size()-2);
+
+	int pos;
+	if (!IS_NPOS(slash) && IS_NPOS(bslash))
+		pos = slash;
+	else if (IS_NPOS(slash) && !IS_NPOS(bslash))
+		pos = bslash;
+	else
+		// STLを使うとstd::maxとの衝突を避けるために
+		// NOMINMAXが定義されmaxマクロが無効化される場合がある
+		pos = slash > bslash ? slash : bslash;
+
+	if (!IS_NPOS(pos)){
+		strDest.erase(pos+1);
+		return true;
+	}
+	else{
+		return false;
+	}
+}
+
+static std::string getValidDir(LPCSTR value){
+	std::string strDir = value;
+
+	// replace double-quotation to backslash
+	if (!strDir.empty() && (strDir.at(strDir.size()-1) == '\"'))
+		strDir.replace(strDir.end()-1, strDir.end(), "\\");
+
+	// trace back to valid directory
+	while (!PathIsDirectoryA(strDir.c_str()) && getParentDir(strDir));
+
+	return strDir;
+}
+
 int	ckOpt::setOption(const char *name, const char *value, bool rsrc)
 {
 	bool	flagSW = true;
@@ -1036,7 +1073,7 @@ int	ckOpt::setOption(const char *name, const char *value, bool rsrc)
 	CHK_MISC("transp",		"tr",		m_transp = atoi(value));
 	CHK_MISC("transpColor",		"trc",		m_isTranspColor = lookupColor(value,m_transpColor));
 	CHK_BOOL("topmost",		"top",		m_isTopMost);
-	CHK_MISC("chdir",		"cd",		m_curDir = value);
+	CHK_MISC("chdir",		"cd",		m_curDir = getValidDir(value));
 	CHK_MISC("exec",		"x",		m_cmd = value);
 	CHK_MISC("title",		"tl",		m_title = value);
 	CHK_MISC("config",		"c",		setFile(value);loadXdefaults() );
