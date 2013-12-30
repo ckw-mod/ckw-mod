@@ -942,6 +942,7 @@ ckOpt::ckOpt()
 	m_winCharH = 24;
 	m_isIconic = false;
 	m_fontSize = 14;
+	m_fontSpace = 0;
 	m_colors[0]  = RGB(0x00, 0x00, 0x01);
 	m_colors[1]  = RGB(0x00, 0x00, 0x80);
 	m_colors[2]  = RGB(0x00, 0x80, 0x00);
@@ -1028,6 +1029,7 @@ int	ckOpt::setOption(const char *name, const char *value, bool rsrc)
 	CHK_BOOL(NULL, 			"iconic",	m_isIconic);
 	CHK_MISC("font",		"fn",		m_font = value);
 	CHK_MISC("fontSize",		"fs",		m_fontSize = atoi(value));
+	CHK_MISC("fontSpace",		"fsp",		m_fontSpace = atoi(value));
 	CHK_BOOL("scrollHide",		"sh",		m_scrollHide);
 	CHK_BOOL("scrollRight",		"sr",		m_scrollRight);
 	CHK_MISC("saveLines",		"sl",		m_saveLines = atoi(value));
@@ -1084,6 +1086,7 @@ static void usage(bool isLong)
 	NULL, 			"iconic",	"boolean",	"start iconic",
 	"font",			"fn",		"string",	"text font name",
 	"fontSize",		"fs",		"number",	"text font size",
+	"fontSpace",		"fsp",		"number",	"number of extra pixels between characters",
 	"scrollHide",		"sh",		"boolean",	"turn on/off scrollbar hide",
 	"scrollRight",		"sr",		"boolean",	"turn on/off scrollbar right",
 	"saveLines",		"sl",		"number",	"save lines",

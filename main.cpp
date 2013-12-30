@@ -57,6 +57,8 @@ DWORD	gCurBlinkNext = 0;
 BOOL	gCurHide = FALSE;
 BOOL	gFocus = FALSE;
 
+int     gFontSpace = 0;
+
 /* screen buffer - copy */
 CONSOLE_SCREEN_BUFFER_INFO* gCSI = NULL;
 CHAR_INFO*	gScreen = NULL;
@@ -312,7 +314,7 @@ static void __draw_screen(HDC hDC)
 		ptr = gScreen + CSI_WndCols(gCSI) * pntY + pntX;
 		pntX *= gFontW;
 		pntY *= gFontH;
-		*work_width = (ptr->Attributes & COMMON_LVB_LEADING_BYTE) ? gFontW*2 : gFontW;
+		*work_width = (ptr->Attributes & COMMON_LVB_LEADING_BYTE) ? (gFontW - gFontSpace)*2 : (gFontW - gFontSpace);
 		if(!gFocus){
 			HPEN hPen = CreatePen(PS_SOLID, 1, gColorTable[ color_bg ]);
 			HPEN hOldPen = (HPEN)SelectObject(hDC, hPen);
@@ -983,7 +985,7 @@ static BOOL create_font(const char* name, int height)
 		width += width2[i];
 	}
 	width /= 26 * 2;
-	gFontW = width; /* met.tmAveCharWidth; */
+	gFontW = width + gFontSpace; /* met.tmAveCharWidth; */
 	gFontH = met.tmHeight + gLineSpace;
 
 	return(TRUE);
@@ -1243,6 +1245,8 @@ BOOL init_options(ckOpt& opt)
 		ZeroMemory(gTitle, sizeof(wchar_t) * (strlen(conf_title)+1));
 		MultiByteToWideChar(CP_ACP, 0, conf_title, (int)strlen(conf_title), gTitle, (int)(sizeof(wchar_t) * (strlen(conf_title)+1)) );
 	}
+
+	gFontSpace = opt.getFontSpace();
 
 	return(TRUE);
 }
